@@ -397,9 +397,8 @@ function render() {
   var styles={elegant:{italic:true,bold:false},bold:{italic:false,bold:true},minimal:{italic:false,bold:false},playful:{italic:false,bold:true}};
   var st=styles[selectedStyle]||styles.elegant;
 
-  var marginX=12;
-  var nameW=memberName?Math.min(TB.w*0.2,240):0;
-  var maxTextW=TB.w-nameW-marginX*3;
+  var marginX=20;
+  var marginY=14;
 
   function wrapText(text, maxW, font) {
     ctx.font=font;
@@ -414,16 +413,26 @@ function render() {
     return lines;
   }
 
-  var fs=Math.min(TB.h*0.55, 72);
+  // Naam staat rechtsonder — reserveer ruimte onderaan als naam actief is
+  var nameFontSize = Math.min(TB.h*0.2, 28);
+  var nameLineH = nameFontSize * 1.3;
+  var nameReserved = memberName ? nameLineH + marginY : 0;
+
+  // Eventtekst vult de volledige breedte, boven de naamregel
+  var maxTextW = TB.w - marginX * 2;
+  var availH = TB.h - marginY * 2 - nameReserved;
+
+  var fs = Math.min(availH * 0.7, 72);
   var lines, font;
   do {
     font=(st.bold?'bold ':'')+( st.italic?'italic ':'')+fs+'px -apple-system,sans-serif';
     lines=wrapText(titleText, maxTextW, font);
     var totalH=lines.length*fs*1.2;
-    if(totalH<=TB.h-8 && ctx.measureText(lines[0]||'').width<=maxTextW) break;
+    if(totalH<=availH && ctx.measureText(lines[0]||'').width<=maxTextW) break;
     fs-=1;
   } while(fs>8);
 
+  // Teken eventtekst — verticaal gecentreerd in het beschikbare gebied boven de naam
   ctx.fillStyle=TB.textColor;
   ctx.font=font;
   ctx.textBaseline='middle';
@@ -431,16 +440,21 @@ function render() {
 
   var lineH=fs*1.2;
   var totalH=lines.length*lineH;
-  var startY=-totalH/2+lineH/2;
+  // Startpositie: bovenkant van beschikbaar gebied + helft van totale texthoogte
+  var textAreaTop = -TB.h/2 + marginY;
+  var textAreaH = TB.h - marginY*2 - nameReserved;
+  var startY = textAreaTop + (textAreaH - totalH)/2 + lineH/2;
   lines.forEach(function(line,i){
-    ctx.fillText(line,-TB.w/2+marginX,startY+i*lineH);
+    ctx.fillText(line, -TB.w/2+marginX, startY+i*lineH);
   });
 
+  // Naam rechtsonder — altijd op vaste positie
   if(memberName){
     ctx.textAlign='right';
-    ctx.font='italic '+(fs*0.6)+'px -apple-system,sans-serif';
+    ctx.textBaseline='bottom';
+    ctx.font='italic '+nameFontSize+'px -apple-system,sans-serif';
     ctx.fillStyle=TB.textColor+'AA';
-    ctx.fillText(memberName,TB.w/2-marginX,0);
+    ctx.fillText(memberName, TB.w/2-marginX, TB.h/2-marginY);
   }
 
   // Handvatten alleen tonen in stap 3
