@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Achtergrond -->
+  <rect width="512" height="512" rx="112" fill="#226FB7"/>
+ 
+  <!-- Gele balk onderaan -->
+  <rect x="0" y="342" width="512" height="170" fill="#EBD61F"/>
+  <rect x="0" y="342" width="512" height="85" fill="#EBD61F"/>
+ 
+  <!-- Camera body -->
+  <rect x="86" y="118" width="340" height="230" rx="42" fill="white" opacity="0.95"/>
+ 
+  <!-- Flitser -->
+  <rect x="322" y="140" width="62" height="40" rx="12" fill="#EBD61F"/>
+ 
+  <!-- Camera lens buitenring -->
+  <circle cx="256" cy="224" r="78" fill="#226FB7"/>
+  <!-- Lens middenring -->
+  <circle cx="256" cy="224" r="52" fill="#1a5a9a"/>
+  <!-- Lens kern -->
+  <circle cx="256" cy="224" r="26" fill="#0d3d6b"/>
+  <!-- Lens glans -->
+  <circle cx="236" cy="206" r="10" fill="white" opacity="0.45"/>
+ 
+  <!-- VEP tekst in gele balk -->
+  <text
+    x="256"
+    y="458"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="96"
+    font-weight="800"
+    fill="#226FB7"
+    text-anchor="middle"
+    dominant-baseline="middle"
+  >VEP</text>
+</svg>
