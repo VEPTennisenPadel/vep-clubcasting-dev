@@ -75,6 +75,8 @@ function loadUserName() {
 }
 
 function setUserName(name) {
+  // Verwijder alles tussen haakjes, bv. "(TV VEP)"
+  name = name.replace(/\s*\(.*?\)\s*/g, '').trim();
   var nameInput = document.getElementById('in-name');
   if (nameInput) nameInput.value = name;
   var badge = document.getElementById('user-badge');
