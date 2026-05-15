@@ -38,9 +38,31 @@ function initMSAL() {
   msalApp.initialize().then(function() {
     msalApp.handleRedirectPromise().then(function() {
       if (!msalApp.getAllAccounts().length) msalApp.loginRedirect(loginReq);
-      else loadEvents();
+      else {
+        loadUserName();
+        loadEvents();
+      }
     });
   });
+}
+
+function loadUserName() {
+  var accs = msalApp ? msalApp.getAllAccounts() : [];
+  if (!accs.length) return;
+  var account = accs[0];
+  // Naam zit al in het account object — geen extra API call nodig
+  var name = account.name || '';
+  if (!name && account.username) {
+    // Fallback: gebruik deel voor @ uit e-mailadres en capitaliseer
+    name = account.username.split('@')[0].replace(/[._]/g, ' ');
+    name = name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+  }
+  if (name) {
+    var nameInput = document.getElementById('in-name');
+    if (nameInput) nameInput.value = name;
+    var badge = document.getElementById('user-badge');
+    if (badge) badge.textContent = name;
+  }
 }
 
 function getToken() {
@@ -103,10 +125,8 @@ var selectedEvent = '';
 var selectedLayout = 'full';
 var selectedStyle = 'elegant';
 
-// Titelbalk state (in canvas-pixels)
+// Titelbalk state
 var TB = { x:0, y:null, w:1920, h:80, rot:0, opacity:0.88, color:'#050514', textColor:'#ffffff' };
-
-// tbEditing: true = in stap 3 (toon handvatten), false = in stap 4 (geen handvatten)
 var tbEditing = true;
 
 // ─────────────────────────────────────────────────────────
@@ -176,7 +196,6 @@ function goStep(n) {
   if(n===2&&!selectedEvent){showErr('Kies een event.');return;}
   clearErr();
 
-  // Bij navigeren naar stap 4: deselect titelbalk en stop interactie
   if(n===4) {
     interaction = null;
     tbEditing = false;
@@ -335,7 +354,8 @@ function render() {
   ctx.fillRect(-TB.w/2,-TB.h/2,TB.w,TB.h);
 
   var caption=document.getElementById('in-caption')?document.getElementById('in-caption').value:'';
-  var memberName=document.getElementById('in-name')?document.getElementById('in-name').value:'';
+  var nameInBar = document.getElementById('cb-name') ? document.getElementById('cb-name').checked : true;
+  var memberName = nameInBar && document.getElementById('in-name') ? document.getElementById('in-name').value : '';
   var titleText=caption?selectedEvent+' — '+caption:selectedEvent;
   var styles={elegant:{italic:true,bold:false},bold:{italic:false,bold:true},minimal:{italic:false,bold:false},playful:{italic:false,bold:true}};
   var st=styles[selectedStyle]||styles.elegant;
@@ -415,9 +435,7 @@ function canvasXY(e) {
   return {x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
 }
 
-function getTBRect() {
-  return {x:TB.x, y:TB.y, w:TB.w, h:TB.h};
-}
+function getTBRect() { return {x:TB.x, y:TB.y, w:TB.w, h:TB.h}; }
 
 function getResizeHandle(px,py) {
   var R=getTBRect(), m=20;
@@ -511,7 +529,6 @@ function onWheel(e) {
   render();
 }
 
-// Event listeners
 document.addEventListener('DOMContentLoaded',function(){
   var c=document.getElementById('C');
   c.addEventListener('mousedown',onMouseDown);
@@ -531,10 +548,7 @@ document.addEventListener('DOMContentLoaded',function(){
       var dx = e.touches[0].clientX - e.touches[1].clientX;
       var dy = e.touches[0].clientY - e.touches[1].clientY;
       lastTouchDist = Math.sqrt(dx*dx + dy*dy);
-      lastTouchMid  = {
-        clientX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-        clientY: (e.touches[0].clientY + e.touches[1].clientY) / 2
-      };
+      lastTouchMid = { clientX:(e.touches[0].clientX+e.touches[1].clientX)/2, clientY:(e.touches[0].clientY+e.touches[1].clientY)/2 };
       interaction = null;
     }
   }, {passive:true});
@@ -547,7 +561,7 @@ document.addEventListener('DOMContentLoaded',function(){
       var dx = e.touches[0].clientX - e.touches[1].clientX;
       var dy = e.touches[0].clientY - e.touches[1].clientY;
       var newDist = Math.sqrt(dx*dx + dy*dy);
-      var scale   = newDist / lastTouchDist;
+      var scale = newDist / lastTouchDist;
       lastTouchDist = newDist;
       var pos = canvasXY(lastTouchMid);
       var idx = hitTestPhoto(pos.x, pos.y);
@@ -598,11 +612,12 @@ function sendSlide(){
   var c=document.getElementById('C');
   var img=c?c.toDataURL('image/jpeg',0.92):null;
   if(!img){showErr('Canvas niet beschikbaar.');return;}
+  var nameInBar = document.getElementById('cb-name') ? document.getElementById('cb-name').checked : true;
   fetch(CFG.APPS_SCRIPT_URL,{
     method:'POST',mode:'no-cors',
     headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({
-      memberName:document.getElementById('in-name').value,
+      memberName: nameInBar ? document.getElementById('in-name').value : '',
       eventName:selectedEvent,
       caption:document.getElementById('in-caption').value,
       layout:selectedLayout,
@@ -635,10 +650,8 @@ function showSuccess(){
 // ─────────────────────────────────────────────────────────
 function setBgColor(el){
   document.querySelectorAll('#bg-swatches .swatch').forEach(function(s){s.classList.remove('sel');});
-  el.classList.add('sel');
-  TB.color=el.dataset.color;
-  document.getElementById('tb-color').value=el.dataset.color;
-  render();
+  el.classList.add('sel'); TB.color=el.dataset.color;
+  document.getElementById('tb-color').value=el.dataset.color; render();
 }
 function setBgColorCustom(v){
   document.querySelectorAll('#bg-swatches .swatch').forEach(function(s){s.classList.remove('sel');});
@@ -646,10 +659,8 @@ function setBgColorCustom(v){
 }
 function setTextColor(el){
   document.querySelectorAll('#text-swatches .swatch').forEach(function(s){s.classList.remove('sel');});
-  el.classList.add('sel');
-  TB.textColor=el.dataset.color;
-  document.getElementById('tb-textcolor').value=el.dataset.color;
-  render();
+  el.classList.add('sel'); TB.textColor=el.dataset.color;
+  document.getElementById('tb-textcolor').value=el.dataset.color; render();
 }
 function setTextColorCustom(v){
   document.querySelectorAll('#text-swatches .swatch').forEach(function(s){s.classList.remove('sel');});
@@ -665,10 +676,12 @@ function resetApp(){
   tbEditing=true;
   document.getElementById('in-name').value='';
   document.getElementById('in-caption').value='';
+  document.getElementById('cb-name').checked=true;
   document.getElementById('pg').innerHTML='';
   document.getElementById('pinfo').style.display='none';
   document.getElementById('btn2').disabled=true;
   document.querySelectorAll('.lo').forEach(function(o,i){o.classList.toggle('sel',i===0);});
   document.querySelectorAll('.sc').forEach(function(c,i){c.classList.toggle('sel',i===0);});
+  loadUserName();
   goStep(1);
 }
