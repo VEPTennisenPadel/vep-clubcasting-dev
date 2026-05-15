@@ -35,6 +35,13 @@
   <!-- STAP 1: INFO -->
   <div class="panel active" id="p1">
     <div class="card">
+      <button class="help-btn" onclick="toggleHelp('help1')" title="Help">?</button>
+      <div class="help-panel" id="help1">
+        <h4>ℹ️ Info invullen <button class="help-close" onclick="toggleHelp('help1')">✕</button></h4>
+        <p><strong>Jouw naam</strong> wordt automatisch ingevuld vanuit je VEP Microsoft account en is niet aanpasbaar.</p>
+        <p><strong>Event</strong> — kies het event waarbij je foto's hebt gemaakt. Staat jouw event er niet tussen? Klik op <em>✏️ Ander event</em> en typ de naam zelf in.</p>
+        <p><strong>Bijschrift</strong> is optioneel en verschijnt achter de eventnaam in de titelbalk, bijv. <em>"Geweldige sfeer!"</em></p>
+      </div>
       <div class="field">
         <label>Jouw naam</label>
         <input type="text" id="in-name" placeholder="Wordt automatisch ingevuld..." autocomplete="off" readonly style="background:var(--bg);color:var(--m);cursor:default">
@@ -63,6 +70,17 @@
   <!-- STAP 2: FOTO'S -->
   <div class="panel" id="p2">
     <div class="card">
+      <button class="help-btn" onclick="toggleHelp('help2')" title="Help">?</button>
+      <div class="help-panel" id="help2">
+        <h4>ℹ️ Foto's uploaden <button class="help-close" onclick="toggleHelp('help2')">✕</button></h4>
+        <p><strong>Klik</strong> op het upload-vlak om foto's te kiezen, of <strong>sleep</strong> ze er direct op.</p>
+        <ul>
+          <li>Ondersteunde formaten: JPG, PNG, WEBP</li>
+          <li>Maximaal 20 foto's per upload</li>
+          <li>Foto verwijderen? Klik op het <strong>✕</strong> op de thumbnail</li>
+          <li>Gebruik foto's in liggende oriëntatie voor het beste resultaat</li>
+        </ul>
+      </div>
       <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
         <div style="font-size:2rem;margin-bottom:8px">📷</div>
         <p style="font-size:14px;font-weight:600;margin-bottom:4px">Klik of sleep foto's</p>
@@ -84,6 +102,24 @@
   <!-- STAP 3: EDITOR -->
   <div class="panel" id="p3">
     <div class="card">
+      <button class="help-btn" onclick="toggleHelp('help3')" title="Help">?</button>
+      <div class="help-panel" id="help3">
+        <h4>ℹ️ Slide editor <button class="help-close" onclick="toggleHelp('help3')">✕</button></h4>
+        <p><strong>Layout</strong> — kies hoe je foto's worden ingedeeld. <em>Auto</em> kiest automatisch op basis van het aantal foto's.</p>
+        <p><strong>Foto aanpassen:</strong></p>
+        <ul>
+          <li>Sleep op een foto om de uitsnede te verschuiven</li>
+          <li>Ctrl + scroll om in/uit te zoomen</li>
+          <li>Pinch op mobiel om te zoomen</li>
+        </ul>
+        <p><strong>Titelbalk:</strong></p>
+        <ul>
+          <li>Sleep de titelbalk om hem te verplaatsen</li>
+          <li>Sleep een hoek om te resizen</li>
+          <li>Pas kleur, transparantie en stijl aan via de instellingen</li>
+          <li>Vink <em>Naam tonen in titelbalk</em> uit als je naam niet zichtbaar hoeft te zijn</li>
+        </ul>
+      </div>
       <div class="field">
         <label>Layout</label>
         <div class="layout-grid">
@@ -162,6 +198,13 @@
   <!-- STAP 4: VERZENDEN -->
   <div class="panel" id="p4">
     <div class="card" id="comp-card">
+      <button class="help-btn" onclick="toggleHelp('help4')" title="Help">?</button>
+      <div class="help-panel" id="help4">
+        <h4>ℹ️ Verzenden <button class="help-close" onclick="toggleHelp('help4')">✕</button></h4>
+        <p>Je slide wordt automatisch aangemaakt en toegevoegd aan de clubcasting presentatie.</p>
+        <p>Na het verzenden kun je via <strong>🎬 Open presentatie</strong> controleren of je slide goed is ingevoegd.</p>
+        <p>Het kan enkele minuten duren voordat je slide zichtbaar is op de TV in de kantine.</p>
+      </div>
       <p style="font-size:14px;font-weight:700;margin-bottom:1rem">Compilatie wordt aangemaakt...</p>
       <div class="prog-list" id="prog-list"></div>
     </div>

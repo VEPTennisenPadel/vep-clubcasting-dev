@@ -11,6 +11,22 @@ var CFG = {
 };
 
 // ─────────────────────────────────────────────────────────
+// HELP
+// ─────────────────────────────────────────────────────────
+function toggleHelp(id) {
+  var panel = document.getElementById(id);
+  if (!panel) return;
+  // Sluit alle andere open panels
+  ['help1','help2','help3','help4'].forEach(function(h) {
+    if (h !== id) {
+      var p = document.getElementById(h);
+      if (p) p.classList.remove('open');
+    }
+  });
+  panel.classList.toggle('open');
+}
+
+// ─────────────────────────────────────────────────────────
 // MSAL
 // ─────────────────────────────────────────────────────────
 var msalApp = null;
