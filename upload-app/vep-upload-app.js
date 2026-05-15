@@ -5,7 +5,7 @@ var CFG = {
   CLIENT_ID:       'b2e58045-5ea5-41e5-ae2d-7546465fd54d',
   TENANT_ID:       '1a3d504f-05a9-466a-bb8d-ba2e3f9e8dca',
   APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzXBA4HllGITD6rM-di97Y0JGQLVGI6DCRxpiflkv9gHOjlMG7leGe6zXIRka8zC2rS/exec',
-  PRESENTATION_ID: '1YSUwZy3GoCJhdMs-av0yxakayyvg4SrnoeoAHpPIl6k',
+  PRESENTATION_ID: '1N8ZIBabKEhP0FbByH6KY57wvjC7BdCBIlSJb4qXrtZo',
   SHAREPOINT_SITE: 'https://veptennis.sharepoint.com/sites/VooralleVEPSharepoint-gebruikers',
   LIST_NAME:       'VEPEvents',
 };
