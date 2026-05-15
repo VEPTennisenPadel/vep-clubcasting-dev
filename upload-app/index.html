@@ -1,1 +1,183 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEP Foto Upload v2.13</title>
+<link rel="stylesheet" href="vep-upload-app.css">
+</head>
+<body>
+<div class="container">
 
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">📷</div>
+    <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
+    <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
+    <span class="badge badge-b">v2.13</span>
+  </div>
+
+  <!-- STAPPEN -->
+  <div class="steps">
+    <div class="step active" id="s1"><div class="step-num">1</div><span>Info</span></div>
+    <div class="step" id="s2"><div class="step-num">2</div><span>Foto's</span></div>
+    <div class="step" id="s3"><div class="step-num">3</div><span>Editor</span></div>
+    <div class="step" id="s4"><div class="step-num">4</div><span>Verzenden</span></div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <!-- STAP 1: INFO -->
+  <div class="panel active" id="p1">
+    <div class="card">
+      <div class="field">
+        <label>Jouw naam</label>
+        <input type="text" id="in-name" placeholder="bv. Jan Janssen" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Event <span style="font-size:10px;color:var(--green);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0" onclick="loadEvents()">↻</span></label>
+        <div id="events-area"><div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--m)"><span class="spinner"></span> Events laden...</div></div>
+      </div>
+      <div class="field">
+        <label>Bijschrift <span style="font-weight:400;text-transform:none;letter-spacing:0">(optioneel)</span></label>
+        <input type="text" id="in-caption" placeholder="bv. Geweldige sfeer!">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-p" onclick="goStep(2)">Verder →</button>
+    </div>
+  </div>
+
+  <!-- STAP 2: FOTO'S -->
+  <div class="panel" id="p2">
+    <div class="card">
+      <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()" ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <div style="font-size:2rem;margin-bottom:8px">📷</div>
+        <p style="font-size:14px;font-weight:600;margin-bottom:4px">Klik of sleep foto's</p>
+        <span style="font-size:12px;color:var(--m)">JPG, PNG, WEBP — max 20 foto's</span>
+      </div>
+      <input type="file" id="fi" multiple accept="image/*" onchange="addFiles(this.files)">
+      <div class="photo-grid" id="pg"></div>
+      <div style="display:none;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--m)" id="pinfo">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>
+        <span id="pcount"></span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-s" onclick="goStep(1)">← Terug</button>
+      <button class="btn-p" id="btn2" onclick="goStep(3)" disabled>Verder →</button>
+    </div>
+  </div>
+
+  <!-- STAP 3: EDITOR -->
+  <div class="panel" id="p3">
+    <div class="card">
+      <div class="field">
+        <label>Layout</label>
+        <div class="layout-grid">
+          <div class="lo sel" onclick="selLayout(this,'full')"><div class="lt" style="grid-template-columns:1fr"><div class="lc"></div></div><div class="ln">Fullscreen</div></div>
+          <div class="lo" onclick="selLayout(this,'duo')"><div class="lt" style="grid-template-columns:1fr 1fr"><div class="lc"></div><div class="lc"></div></div><div class="ln">Duo</div></div>
+          <div class="lo" onclick="selLayout(this,'featured')"><div class="lt" style="grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr"><div class="lc" style="grid-row:1/3"></div><div class="lc"></div><div class="lc"></div></div><div class="ln">Featured</div></div>
+          <div class="lo" onclick="selLayout(this,'grid4')"><div class="lt" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr"><div class="lc"></div><div class="lc"></div><div class="lc"></div><div class="lc"></div></div><div class="ln">Grid</div></div>
+          <div class="lo" onclick="selLayout(this,'strip')"><div class="lt" style="grid-template-columns:1fr 1fr 1fr"><div class="lc"></div><div class="lc"></div><div class="lc"></div></div><div class="ln">Strip</div></div>
+          <div class="lo" onclick="selLayout(this,'mosaic')"><div class="lt" style="grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr"><div class="lc" style="grid-column:1/3"></div><div class="lc"></div><div class="lc"></div><div class="lc"></div><div class="lc"></div></div><div class="ln">Mozaïek</div></div>
+          <div class="lo" onclick="selLayout(this,'cinematic')"><div class="lt" style="grid-template-rows:4fr 1fr"><div class="lc"></div><div class="lc" style="opacity:.35"></div></div><div class="ln">Cinematic</div></div>
+          <div class="lo" onclick="selLayout(this,'auto')"><div class="lt" style="display:flex;align-items:center;justify-content:center"><span style="font-size:18px">✨</span></div><div class="ln">Auto</div></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Slide editor</label>
+        <div class="editor-wrap" id="editor-wrap"><canvas id="C"></canvas></div>
+        <div class="editor-hint">
+          <span>🖱️ Sleep op foto = verschuif uitsnede</span>
+          <span>⌨️ Ctrl + scroll = zoom foto</span>
+          <span>✋ Sleep titelbalk = verplaats</span>
+          <span>↔️ Sleep rand titelbalk = resize</span>
+        </div>
+      </div>
+      <div class="tb-panel">
+        <h4>Titelbalk instellingen</h4>
+        <div class="tb-grid">
+          <div class="tb-field"><label>Breedte (px)</label><input type="number" id="tb-w" value="1920" min="200" max="1920" oninput="render()"></div>
+          <div class="tb-field"><label>Hoogte (px)</label><input type="number" id="tb-h" value="80" min="30" max="300" oninput="render()"></div>
+        </div>
+        <div class="tb-grid">
+          <div class="tb-field"><label>Transparantie %</label><input type="number" id="tb-op" value="88" min="0" max="100" oninput="render()"></div>
+          <div class="tb-field"><label>Rotatie °</label><input type="number" id="tb-rot" value="0" min="-180" max="180" oninput="render()"></div>
+        </div>
+        <div style="margin-top:.5rem">
+          <label style="font-size:11px;font-weight:500;color:var(--m);display:block;margin-bottom:6px">Achtergrondkleur <span style="font-size:10px;color:#999">(VEP kleuren)</span></label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="bg-swatches">
+            <div class="swatch sel" data-color="#050514" onclick="setBgColor(this)" style="background:#050514" title="Zwart"></div>
+            <div class="swatch" data-color="#226FB7" onclick="setBgColor(this)" style="background:#226FB7" title="VEP Blauw"></div>
+            <div class="swatch" data-color="#4485C6" onclick="setBgColor(this)" style="background:#4485C6" title="Lichtblauw"></div>
+            <div class="swatch" data-color="#EBD61F" onclick="setBgColor(this)" style="background:#EBD61F" title="VEP Geel"></div>
+            <div class="swatch" data-color="#C1CD2E" onclick="setBgColor(this)" style="background:#C1CD2E" title="VEP Groen"></div>
+            <div class="swatch" data-color="#676A33" onclick="setBgColor(this)" style="background:#676A33" title="Donkergroen"></div>
+            <div class="swatch" data-color="#FFFFFF" onclick="setBgColor(this)" style="background:#FFFFFF;border:1px solid #ddd" title="Wit"></div>
+            <input type="color" id="tb-color" value="#050514" oninput="setBgColorCustom(this.value)" title="Aangepaste kleur" style="width:32px;height:32px;padding:2px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer">
+          </div>
+        </div>
+        <div style="margin-top:.75rem">
+          <label style="font-size:11px;font-weight:500;color:var(--m);display:block;margin-bottom:6px">Tekstkleur <span style="font-size:10px;color:#999">(VEP kleuren)</span></label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="text-swatches">
+            <div class="swatch sel" data-color="#FFFFFF" onclick="setTextColor(this)" style="background:#FFFFFF;border:1px solid #ddd" title="Wit"></div>
+            <div class="swatch" data-color="#EBD61F" onclick="setTextColor(this)" style="background:#EBD61F" title="VEP Geel"></div>
+            <div class="swatch" data-color="#226FB7" onclick="setTextColor(this)" style="background:#226FB7" title="VEP Blauw"></div>
+            <div class="swatch" data-color="#C1CD2E" onclick="setTextColor(this)" style="background:#C1CD2E" title="VEP Groen"></div>
+            <div class="swatch" data-color="#050514" onclick="setTextColor(this)" style="background:#050514" title="Zwart"></div>
+            <div class="swatch" data-color="#F6E521" onclick="setTextColor(this)" style="background:#F6E521" title="Helder geel"></div>
+            <input type="color" id="tb-textcolor" value="#ffffff" oninput="setTextColorCustom(this.value)" title="Aangepaste kleur" style="width:32px;height:32px;padding:2px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer">
+          </div>
+        </div>
+        <div style="margin-top:.75rem">
+          <label style="font-size:11px;font-weight:500;color:var(--m);display:block;margin-bottom:6px">Stijl</label>
+          <div class="style-chips">
+            <div class="sc sel" onclick="selSC(this,'elegant')">✨ Elegant</div>
+            <div class="sc" onclick="selSC(this,'bold')">💥 Bold</div>
+            <div class="sc" onclick="selSC(this,'minimal')">— Minimaal</div>
+            <div class="sc" onclick="selSC(this,'playful')">🎉 Speels</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-s" onclick="goStep(2)">← Terug</button>
+      <button class="btn-p" onclick="goStep(4)">📊 Slide maken →</button>
+    </div>
+  </div>
+
+  <!-- STAP 4: VERZENDEN -->
+  <div class="panel" id="p4">
+    <div class="card" id="comp-card">
+      <p style="font-size:14px;font-weight:700;margin-bottom:1rem">Compilatie wordt aangemaakt...</p>
+      <div class="prog-list" id="prog-list"></div>
+    </div>
+    <div class="card" id="ok-card" style="display:none">
+      <div style="text-align:center;padding:.5rem 0">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1rem">✅</div>
+        <p style="font-size:17px;font-weight:700;margin-bottom:6px">Slide toegevoegd!</p>
+        <p style="font-size:13px;color:var(--m)">De slide verschijnt binnenkort op de clubcasting bij VEP.</p>
+        <div class="sum-grid">
+          <div class="sum-cell"><p>Lid</p><p id="sm-name">—</p></div>
+          <div class="sum-cell"><p>Event</p><p id="sm-event">—</p></div>
+          <div class="sum-cell"><p>Foto's</p><p id="sm-photos">—</p></div>
+          <div class="sum-cell"><p>Layout</p><p id="sm-layout">—</p></div>
+        </div>
+        <div class="btn-row" style="margin-top:1.25rem">
+          <button class="btn-s" onclick="resetApp()">Nieuwe upload</button>
+          <button class="btn-p" style="flex:none" id="btn-open">🎬 Open presentatie</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="rec-card" style="display:none">
+      <p style="font-size:14px;font-weight:700;margin-bottom:.5rem">Recente uploads</p>
+      <div class="recent-list" id="rec-list"></div>
+    </div>
+  </div>
+
+</div>
+<script src="../shared/msal-browser.min.js"></script>
+<script src="vep-upload-app.js"></script>
+</body>
+</html>
