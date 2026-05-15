@@ -50,19 +50,35 @@ function loadUserName() {
   var accs = msalApp ? msalApp.getAllAccounts() : [];
   if (!accs.length) return;
   var account = accs[0];
-  // Naam zit al in het account object — geen extra API call nodig
+  // Probeer eerst account.name (beschikbaar via ID token)
   var name = account.name || '';
-  if (!name && account.username) {
-    // Fallback: gebruik deel voor @ uit e-mailadres en capitaliseer
-    name = account.username.split('@')[0].replace(/[._]/g, ' ');
-    name = name.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
-  }
   if (name) {
-    var nameInput = document.getElementById('in-name');
-    if (nameInput) nameInput.value = name;
-    var badge = document.getElementById('user-badge');
-    if (badge) badge.textContent = name;
+    setUserName(name);
+  } else {
+    // Fallback: haal naam op via Microsoft Graph
+    getToken().then(function(tok) {
+      return fetch('https://graph.microsoft.com/v1.0/me?$select=displayName', {
+        headers: { 'Authorization': 'Bearer ' + tok, 'Accept': 'application/json' }
+      });
+    }).then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.displayName) setUserName(d.displayName);
+    }).catch(function(){
+      // Laatste fallback: e-mailadres
+      if (account.username) {
+        var n = account.username.split('@')[0].replace(/[._]/g, ' ');
+        n = n.replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+        setUserName(n);
+      }
+    });
   }
+}
+
+function setUserName(name) {
+  var nameInput = document.getElementById('in-name');
+  if (nameInput) nameInput.value = name;
+  var badge = document.getElementById('user-badge');
+  if (badge) badge.textContent = name;
 }
 
 function getToken() {
@@ -147,10 +163,27 @@ function loadEvents() {
     evts.forEach(function(ev,i){
       var c=document.createElement('div'); c.className='chip'+(i===0?' sel':'');
       c.textContent=ev.Emoji+' '+ev.Title;
-      c.onclick=function(){document.querySelectorAll('#ec .chip').forEach(function(x){x.classList.remove('sel');});c.classList.add('sel');selectedEvent=ev.Title;};
+      c.onclick=function(){
+        document.querySelectorAll('#ec .chip').forEach(function(x){x.classList.remove('sel');});
+        c.classList.add('sel');
+        selectedEvent=ev.Title;
+        document.getElementById('custom-event-wrap').style.display='none';
+        document.getElementById('in-custom-event').value='';
+      };
       row.appendChild(c);
       if(i===0) selectedEvent=ev.Title;
     });
+    // Voeg "Ander event" chip toe aan het einde
+    var cOther=document.createElement('div'); cOther.className='chip';
+    cOther.textContent='✏️ Ander event';
+    cOther.onclick=function(){
+      document.querySelectorAll('#ec .chip').forEach(function(x){x.classList.remove('sel');});
+      cOther.classList.add('sel');
+      selectedEvent='';
+      document.getElementById('custom-event-wrap').style.display='block';
+      document.getElementById('in-custom-event').focus();
+    };
+    row.appendChild(cOther);
   }).catch(function(){a.innerHTML='<div class="events-error">Events konden niet geladen worden.</div>';});
 }
 
@@ -193,7 +226,9 @@ function onDrop(e){e.preventDefault();onDragLeave();addFiles(e.dataTransfer.file
 // ─────────────────────────────────────────────────────────
 function goStep(n) {
   if(n===2&&!document.getElementById('in-name').value.trim()){showErr('Vul je naam in.');return;}
-  if(n===2&&!selectedEvent){showErr('Kies een event.');return;}
+  var customEvent = document.getElementById('in-custom-event') ? document.getElementById('in-custom-event').value.trim() : '';
+  if(n===2&&!selectedEvent&&!customEvent){showErr('Kies een event of vul een eventnaam in.');return;}
+  if(n===2&&customEvent) selectedEvent=customEvent;
   clearErr();
 
   if(n===4) {
@@ -677,6 +712,8 @@ function resetApp(){
   document.getElementById('in-name').value='';
   document.getElementById('in-caption').value='';
   document.getElementById('cb-name').checked=true;
+  if(document.getElementById('in-custom-event')) document.getElementById('in-custom-event').value='';
+  if(document.getElementById('custom-event-wrap')) document.getElementById('custom-event-wrap').style.display='none';
   document.getElementById('pg').innerHTML='';
   document.getElementById('pinfo').style.display='none';
   document.getElementById('btn2').disabled=true;

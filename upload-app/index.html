@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.13</title>
+<title>VEP Foto Upload v2.15</title>
 <link rel="stylesheet" href="vep-upload-app.css">
 </head>
 <body><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div>
@@ -14,7 +14,7 @@
     <div class="logo">📷</div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.13</span>
+    <span class="badge badge-b">v2.15</span>
   </div>
 
   <!-- STAPPEN -->
@@ -32,7 +32,7 @@
     <div class="card">
       <div class="field">
         <label>Jouw naam</label>
-        <input type="text" id="in-name" placeholder="bv. Jan Janssen" autocomplete="name">
+        <input type="text" id="in-name" placeholder="Wordt automatisch ingevuld..." autocomplete="off" readonly style="background:var(--bg);color:var(--m);cursor:default">
         <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
           <input type="checkbox" id="cb-name" checked onchange="render()" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0">
           <label for="cb-name" style="font-size:12px;color:var(--m);font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer;margin:0">Naam tonen in titelbalk</label>
@@ -41,6 +41,9 @@
       <div class="field">
         <label>Event <span style="font-size:10px;color:var(--green);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0" onclick="loadEvents()">↻</span></label>
         <div id="events-area"><div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--m)"><span class="spinner"></span> Events laden...</div></div>
+      </div>
+      <div id="custom-event-wrap" style="display:none;margin-top:8px">
+        <input type="text" id="in-custom-event" placeholder="Typ hier je eventnaam..." style="width:100%" oninput="selectedEvent=this.value.trim()">
       </div>
       <div class="field">
         <label>Bijschrift <span style="font-weight:400;text-transform:none;letter-spacing:0">(optioneel)</span></label>
