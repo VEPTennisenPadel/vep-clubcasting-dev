@@ -5,9 +5,9 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --green:#1D9E75;
-  --gl:#E1F5EE;
-  --gd:#0F6E56;
+  --green:#226FB7;
+  --gl:#E8F1F9;
+  --gd:#1a5a9a;
   --r:10px;
   --rl:14px;
   --b:1px solid #e5e7eb;
@@ -24,12 +24,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── HEADER ── */
 .header{display:flex;align-items:center;gap:12px;margin-bottom:1.75rem}
-.logo{width:42px;height:42px;border-radius:var(--r);background:var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.logo{width:42px;height:42px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
 .header h1{font-size:17px;font-weight:700}
 .header p{font-size:13px;color:var(--m);margin-top:1px}
 .badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
-.badge-g{background:var(--gl);color:var(--gd)}
-.badge-b{background:#e0f2fe;color:#0369a1;margin-left:6px}
+.badge-g{background:#FDF6CC;color:#8a7000}
+.badge-b{background:#E8F1F9;color:#1a5a9a;margin-left:6px}
 
 /* ── STAPPEN ── */
 .steps{display:flex;gap:4px;margin-bottom:1.75rem}
