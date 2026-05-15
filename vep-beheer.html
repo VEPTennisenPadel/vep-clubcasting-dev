@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEP Beheer v4.9</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#1D9E75;--gl:#E1F5EE;--gd:#0F6E56;--r:10px;--rl:14px;--b:1px solid #e5e7eb;--t:#111827;--m:#6b7280;--bg:#f9fafb;--w:#fff;--sh:0 1px 3px rgba(0,0,0,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.container{max-width:700px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:1.75rem}
+.logo{width:42px;height:42px;border-radius:var(--r);background:var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.header h1{font-size:17px;font-weight:700}
+.header p{font-size:13px;color:var(--m);margin-top:1px}
+.badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.badge-admin{background:#fef3c7;color:#92400e}
+.badge-version{background:#e0f2fe;color:#0369a1;margin-left:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
+.stat{background:var(--w);border:var(--b);border-radius:var(--rl);padding:12px 14px;box-shadow:var(--sh)}
+.stat p:first-child{font-size:11px;color:var(--m);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.stat p:last-child{font-size:22px;font-weight:700;color:var(--t)}
+.card{background:var(--w);border:var(--b);border-radius:var(--rl);padding:1.25rem;margin-bottom:.875rem;box-shadow:var(--sh)}
+.card-title{font-size:14px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+input[type=text],input[type=date],select{width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:var(--r);font-size:14px;color:var(--t);outline:none;transition:border-color .15s;background:var(--w);font-family:inherit}
+input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.emoji-row{display:flex;flex-wrap:wrap;gap:6px}
+.emoji-opt{width:36px;height:36px;border-radius:8px;background:var(--bg);border:1px solid #d1d5db;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .15s}
+.emoji-opt:hover,.emoji-opt.sel{background:var(--gl);border-color:var(--green);transform:scale(1.1)}
+.btn-row{display:flex;gap:8px;margin-top:1.25rem}
+.btn-p{flex:1;padding:10px;border-radius:var(--r);background:var(--green);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn-p:hover{background:var(--gd)}
+.btn-p:disabled{opacity:.4;cursor:default}
+.btn-s{padding:10px 16px;border-radius:var(--r);background:var(--w);color:var(--m);border:1px solid #d1d5db;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-s:hover{border-color:var(--green);color:var(--gd)}
+.events-list{display:flex;flex-direction:column;gap:8px}
+.event-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r);border:1px solid #e5e7eb;background:var(--w);transition:all .15s}
+.event-row:hover{border-color:#d1d5db;box-shadow:var(--sh)}
+.ev-emoji{font-size:20px;flex-shrink:0;width:32px;text-align:center}
+.ev-info{flex:1;min-width:0}
+.ev-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-meta{font-size:11px;color:var(--m);margin-top:2px}
+.ev-cat{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--gl);color:var(--gd)}
+.ev-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-icon{width:30px;height:30px;border-radius:8px;border:1px solid #e5e7eb;background:var(--w);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-icon:hover{border-color:var(--green);background:var(--gl)}
+.btn-icon.del:hover{border-color:#fca5a5;background:#fef2f2}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(29,158,117,.3);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--m);padding:1rem 0}
+.empty{text-align:center;padding:2rem;color:var(--m);font-size:13px}
+.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--r);padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:.875rem;display:none}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--w);border-radius:var(--rl);padding:1.5rem;width:90%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.15);transform:scale(.95);transition:transform .2s}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:1.25rem}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(100px);background:#111;color:#fff;padding:10px 20px;border-radius:30px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:all .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#dc2626}
+.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;padding:2rem}
+.login-card{background:var(--w);border:var(--b);border-radius:var(--rl);padding:2.5rem 2rem;max-width:360px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.login-logo{width:64px;height:64px;border-radius:16px;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 1.25rem}
+.login-card h2{font-size:18px;font-weight:700;margin-bottom:8px}
+.login-card p{font-size:13px;color:var(--m);margin-bottom:1.5rem}
+.btn-ms{width:100%;padding:11px;border-radius:var(--r);background:#0078d4;color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}
+.btn-ms:hover{background:#106ebe}
+.login-err{font-size:12px;color:#dc2626;margin-top:.75rem;min-height:18px}
+#app{display:none}
+</style>
+</head>
+<body>
+
+<!-- Login scherm -->
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">⚙️</div>
+    <h2>VEP Event Beheer</h2>
+    <p>Log in met je VEP Microsoft-account om events te beheren.</p>
+    <button class="btn-ms" id="login-btn">
+      <svg width="18" height="18" viewBox="0 0 21 21"><rect x="1" y="1" width="9" height="9" fill="#f25022"/><rect x="11" y="1" width="9" height="9" fill="#7fba00"/><rect x="1" y="11" width="9" height="9" fill="#00a4ef"/><rect x="11" y="11" width="9" height="9" fill="#ffb900"/></svg>
+      Inloggen met Microsoft
+    </button>
+    <div class="login-err" id="login-err"></div>
+    <p style="font-size:11px;color:var(--m);margin-top:1rem">Alleen voor beheerders van VEP Tennis &amp; Padel</p>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+<div class="container">
+  <div class="header">
+    <div class="logo">⚙️</div>
+    <div><h1>VEP Event Beheer</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
+    <span class="badge badge-admin" style="margin-left:auto" id="user-badge">Beheerder</span>
+    <span class="badge badge-version">v4.9</span>
+  </div>
+
+  <div class="err-box" id="err-box"></div>
+
+  <div class="stats">
+    <div class="stat"><p>Totaal events</p><p id="stat-total">—</p></div>
+    <div class="stat"><p>Komende events</p><p id="stat-upcoming">—</p></div>
+    <div class="stat"><p>Al geweest</p><p id="stat-past">—</p></div>
+  </div>
+
+  <!-- Nieuw event -->
+  <div class="card">
+    <div class="card-title">➕ Nieuw event toevoegen</div>
+    <div class="field"><label>Event naam</label><input type="text" id="ev-name" placeholder="bv. Zomerfestival 2025"></div>
+    <div class="form-row">
+      <div class="field"><label>Datum van</label><input type="date" id="ev-from"></div>
+      <div class="field"><label>Datum tot</label><input type="date" id="ev-to"></div>
+    </div>
+    <div class="field">
+      <label>Categorie</label>
+      <select id="ev-cat">
+        <option value="Tennis">🎾 Tennis</option>
+        <option value="Padel">🏓 Padel</option>
+        <option value="Sociaal">🎉 Sociaal</option>
+        <option value="Jeugd">👦 Jeugd</option>
+        <option value="Competitie">🏆 Competitie</option>
+        <option value="Anders">📌 Anders</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Emoji</label>
+      <div class="emoji-row" id="emoji-row">
+        <div class="emoji-opt sel" data-emoji="🎾" onclick="selEmoji(this)">🎾</div>
+        <div class="emoji-opt" data-emoji="🏓" onclick="selEmoji(this)">🏓</div>
+        <div class="emoji-opt" data-emoji="🏆" onclick="selEmoji(this)">🏆</div>
+        <div class="emoji-opt" data-emoji="🎉" onclick="selEmoji(this)">🎉</div>
+        <div class="emoji-opt" data-emoji="👦" onclick="selEmoji(this)">👦</div>
+        <div class="emoji-opt" data-emoji="🌞" onclick="selEmoji(this)">🌞</div>
+        <div class="emoji-opt" data-emoji="⭐" onclick="selEmoji(this)">⭐</div>
+        <div class="emoji-opt" data-emoji="🎵" onclick="selEmoji(this)">🎵</div>
+        <div class="emoji-opt" data-emoji="🍕" onclick="selEmoji(this)">🍕</div>
+        <div class="emoji-opt" data-emoji="🏅" onclick="selEmoji(this)">🏅</div>
+        <div class="emoji-opt" data-emoji="🎊" onclick="selEmoji(this)">🎊</div>
+        <div class="emoji-opt" data-emoji="📅" onclick="selEmoji(this)">📅</div>
+      </div>
+    </div>
+    <div id="form-err" style="font-size:13px;color:#dc2626;min-height:18px;margin-bottom:8px"></div>
+    <button class="btn-p" id="btn-add" onclick="addEvent()">
+      <span id="btn-add-icon">✅</span> Event toevoegen
+    </button>
+  </div>
+
+  <!-- Events lijst -->
+  <div class="card">
+    <div class="card-title">
+      📋 Huidige events
+      <button onclick="loadEvents()" style="margin-left:auto;padding:4px 10px;border-radius:20px;border:1px solid #d1d5db;background:none;font-size:12px;cursor:pointer;color:var(--m)">↻ Vernieuwen</button>
+    </div>
+    <div id="events-container"><div class="loading"><span class="spinner"></span> Events laden...</div></div>
+  </div>
+</div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">✏️ Event bewerken</div>
+    <div class="field"><label>Event naam</label><input type="text" id="edit-name" placeholder="Event naam"></div>
+    <div class="form-row">
+      <div class="field"><label>Datum van</label><input type="date" id="edit-from"></div>
+      <div class="field"><label>Datum tot</label><input type="date" id="edit-to"></div>
+    </div>
+    <div class="field">
+      <label>Categorie</label>
+      <select id="edit-cat">
+        <option value="Tennis">🎾 Tennis</option>
+        <option value="Padel">🏓 Padel</option>
+        <option value="Sociaal">🎉 Sociaal</option>
+        <option value="Jeugd">👦 Jeugd</option>
+        <option value="Competitie">🏆 Competitie</option>
+        <option value="Anders">📌 Anders</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Emoji</label>
+      <div class="emoji-row" id="edit-emoji-row">
+        <div class="emoji-opt sel" data-emoji="🎾" onclick="selEditEmoji(this)">🎾</div>
+        <div class="emoji-opt" data-emoji="🏓" onclick="selEditEmoji(this)">🏓</div>
+        <div class="emoji-opt" data-emoji="🏆" onclick="selEditEmoji(this)">🏆</div>
+        <div class="emoji-opt" data-emoji="🎉" onclick="selEditEmoji(this)">🎉</div>
+        <div class="emoji-opt" data-emoji="👦" onclick="selEditEmoji(this)">👦</div>
+        <div class="emoji-opt" data-emoji="🌞" onclick="selEditEmoji(this)">🌞</div>
+        <div class="emoji-opt" data-emoji="⭐" onclick="selEditEmoji(this)">⭐</div>
+        <div class="emoji-opt" data-emoji="🎵" onclick="selEditEmoji(this)">🎵</div>
+        <div class="emoji-opt" data-emoji="🍕" onclick="selEditEmoji(this)">🍕</div>
+        <div class="emoji-opt" data-emoji="🏅" onclick="selEditEmoji(this)">🏅</div>
+        <div class="emoji-opt" data-emoji="🎊" onclick="selEditEmoji(this)">🎊</div>
+        <div class="emoji-opt" data-emoji="📅" onclick="selEditEmoji(this)">📅</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-s" onclick="closeModal()">Annuleren</button>
+      <button class="btn-p" onclick="saveEdit()">💾 Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+var CLIENT_ID   = 'b2e58045-5ea5-41e5-ae2d-7546465fd54d';
+var TENANT_ID   = '1a3d504f-05a9-466a-bb8d-ba2e3f9e8dca';
+var REDIRECT    = window.location.href.split('?')[0].split('#')[0];
+var GRAPH       = 'https://graph.microsoft.com/v1.0';
+var SITE_PATH   = encodeURIComponent('veptennis.sharepoint.com:/sites/VooralleVEPSharepoint-gebruikers:');
+var LIST_API    = GRAPH + '/sites/' + SITE_PATH + '/lists/VEPEvents/items';
+var APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzXBA4HllGITD6rM-di97Y0JGQLVGI6DCRxpiflkv9gHOjlMG7leGe6zXIRka8zC2rS/exec';
+
+var loginRequest = { scopes: ['Sites.ReadWrite.All', 'User.Read'] };
+var msalApp = null;
+var allEvents = [];
+var editingId = null;
+var selectedEmoji = '🎾';
+var selectedEditEmoji = '🎾';
+
+// ── MSAL ────────────────────────────────────────────────
+function loadScript(url, cb) {
+  var s = document.createElement('script');
+  s.src = url;
+  s.onload = function() { cb(null); };
+  s.onerror = function() { cb(new Error('Laden mislukt: ' + url)); };
+  document.head.appendChild(s);
+}
+
+var msalLocalUrl = window.location.href.replace(/[^/]*$/, '') + 'msal-browser.min.js';
+loadScript(msalLocalUrl, function(err) {
+  if (err || typeof msal === 'undefined') {
+    loadScript('https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js', function(err2) {
+      if (err2 || typeof msal === 'undefined') {
+        showLoginError('MSAL kon niet geladen worden.');
+      } else {
+        initMSAL();
+      }
+    });
+  } else {
+    initMSAL();
+  }
+});
+
+function initMSAL() {
+  var config = {
+    auth: { clientId: CLIENT_ID, authority: 'https://login.microsoftonline.com/' + TENANT_ID, redirectUri: REDIRECT },
+    cache: { cacheLocation: 'sessionStorage' }
+  };
+  msalApp = new msal.PublicClientApplication(config);
+  msalApp.initialize().then(function() {
+    msalApp.handleRedirectPromise().then(function(resp) {
+      var accounts = msalApp.getAllAccounts();
+      if (accounts.length > 0) {
+        showApp(accounts[0]);
+      } else {
+        showLogin();
+      }
+    }).catch(function(e) {
+      showLoginError(e.message);
+    });
+  });
+}
+
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+function showApp(account) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  var name = account.name || account.username;
+  document.getElementById('user-badge').textContent = name.split(' ')[0];
+  loadEvents();
+}
+
+function showLoginError(msg) {
+  document.getElementById('login-err').textContent = msg;
+}
+
+function getToken() {
+  var accounts = msalApp ? msalApp.getAllAccounts() : [];
+  if (!accounts.length) return Promise.reject('Niet ingelogd');
+  return msalApp.acquireTokenSilent({ scopes: loginRequest.scopes, account: accounts[0] })
+    .then(function(r) { return r.accessToken; })
+    .catch(function() {
+      return msalApp.acquireTokenPopup(loginRequest).then(function(r) { return r.accessToken; });
+    });
+}
+
+document.getElementById('login-btn').addEventListener('click', function() {
+  if (!msalApp) { showLoginError('App nog niet geladen, probeer opnieuw.'); return; }
+  msalApp.loginRedirect(loginRequest);
+});
+
+// ── EVENTS LADEN ────────────────────────────────────────
+function loadEvents() {
+  document.getElementById('events-container').innerHTML = '<div class="loading"><span class="spinner"></span> Events laden...</div>';
+  getToken().then(function(tok) {
+    return fetch(LIST_API + '?expand=fields(select=Title,DateFrom,DateTo,Category,Emoji)&$top=100', {
+      headers: { 'Authorization': 'Bearer ' + tok, 'Accept': 'application/json' }
+    });
+  }).then(function(r) { return r.json(); })
+  .then(function(d) {
+    allEvents = (d.value || []).map(function(i) {
+      return {
+        id:       i.id,
+        listId:   i.id,
+        Title:    i.fields.Title,
+        DateFrom: (i.fields.DateFrom || '').split('T')[0],
+        DateTo:   (i.fields.DateTo   || '').split('T')[0],
+        Category: i.fields.Category || 'Anders',
+        Emoji:    i.fields.Emoji    || '📅'
+      };
+    }).sort(function(a, b) { return a.DateFrom > b.DateFrom ? 1 : -1; });
+    renderEvents();
+    updateStats();
+  }).catch(function(e) {
+    document.getElementById('events-container').innerHTML = '<div class="empty">Kon events niet laden: ' + e.message + '</div>';
+  });
+}
+
+function updateStats() {
+  var today = new Date().toISOString().split('T')[0];
+  var upcoming = allEvents.filter(function(e) { return e.DateFrom >= today; }).length;
+  var past     = allEvents.filter(function(e) { return e.DateTo < today; }).length;
+  document.getElementById('stat-total').textContent    = allEvents.length;
+  document.getElementById('stat-upcoming').textContent = upcoming;
+  document.getElementById('stat-past').textContent     = past;
+}
+
+function renderEvents() {
+  var c = document.getElementById('events-container');
+  if (!allEvents.length) { c.innerHTML = '<div class="empty">Nog geen events aangemaakt.</div>'; return; }
+  var today = new Date().toISOString().split('T')[0];
+  c.innerHTML = '<div class="events-list">' + allEvents.map(function(ev) {
+    var status = ev.DateFrom > today ? 'Aankomend' : ev.DateTo < today ? 'Geweest' : 'Actief';
+    var statusColor = status === 'Aankomend' ? '#0369a1' : status === 'Actief' ? '#15803d' : '#6b7280';
+    var statusBg    = status === 'Aankomend' ? '#e0f2fe' : status === 'Actief' ? '#dcfce7' : '#f3f4f6';
+    return '<div class="event-row">' +
+      '<div class="ev-emoji">' + ev.Emoji + '</div>' +
+      '<div class="ev-info">' +
+        '<div class="ev-name">' + ev.Title + '</div>' +
+        '<div class="ev-meta">' + ev.DateFrom + (ev.DateTo !== ev.DateFrom ? ' — ' + ev.DateTo : '') + ' &nbsp;·&nbsp; ' + ev.Category + '</div>' +
+      '</div>' +
+      '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:' + statusBg + ';color:' + statusColor + '">' + status + '</span>' +
+      '<div class="ev-actions">' +
+        '<button class="btn-icon" onclick="openEdit(\'' + ev.id + '\')" title="Bewerken">✏️</button>' +
+        '<button class="btn-icon del" onclick="deleteEvent(\'' + ev.id + '\')" title="Verwijderen">🗑️</button>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+// ── EMOJI ────────────────────────────────────────────────
+function selEmoji(el) {
+  document.querySelectorAll('#emoji-row .emoji-opt').forEach(function(e) { e.classList.remove('sel'); });
+  el.classList.add('sel');
+  selectedEmoji = el.dataset.emoji;
+}
+function selEditEmoji(el) {
+  document.querySelectorAll('#edit-emoji-row .emoji-opt').forEach(function(e) { e.classList.remove('sel'); });
+  el.classList.add('sel');
+  selectedEditEmoji = el.dataset.emoji;
+}
+
+// ── EVENT TOEVOEGEN ─────────────────────────────────────
+function addEvent() {
+  var name = document.getElementById('ev-name').value.trim();
+  var from = document.getElementById('ev-from').value;
+  var to   = document.getElementById('ev-to').value || from;
+  var cat  = document.getElementById('ev-cat').value;
+  var err  = document.getElementById('form-err');
+  if (!name) { err.textContent = 'Vul een eventnaam in.'; return; }
+  if (!from) { err.textContent = 'Kies een begindatum.'; return; }
+  err.textContent = '';
+  var btn = document.getElementById('btn-add');
+  btn.disabled = true;
+  document.getElementById('btn-add-icon').className = 'spinner';
+  getToken().then(function(tok) {
+    return fetch(LIST_API, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + tok, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: { Title: name, DateFrom: from, DateTo: to, Category: cat, Emoji: selectedEmoji } })
+    });
+  }).then(function(r) {
+    if (!r.ok) throw new Error('Status ' + r.status);
+    document.getElementById('ev-name').value = '';
+    document.getElementById('ev-from').value = '';
+    document.getElementById('ev-to').value   = '';
+    showToast('Event "' + name + '" toegevoegd! ✅', 'success');
+    loadEvents();
+  }).catch(function(e) {
+    showToast('Fout: ' + e.message, 'error');
+  }).finally(function() {
+    btn.disabled = false;
+    document.getElementById('btn-add-icon').className = '';
+    document.getElementById('btn-add-icon').textContent = '✅';
+  });
+}
+
+// ── EDIT ────────────────────────────────────────────────
+function openEdit(id) {
+  var ev = allEvents.find(function(e) { return e.id === id; });
+  if (!ev) return;
+  editingId = id;
+  document.getElementById('edit-name').value = ev.Title;
+  document.getElementById('edit-from').value = ev.DateFrom;
+  document.getElementById('edit-to').value   = ev.DateTo;
+  document.getElementById('edit-cat').value  = ev.Category;
+  selectedEditEmoji = ev.Emoji;
+  document.querySelectorAll('#edit-emoji-row .emoji-opt').forEach(function(el) {
+    el.classList.toggle('sel', el.dataset.emoji === ev.Emoji);
+  });
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  editingId = null;
+}
+
+function saveEdit() {
+  if (!editingId) return;
+  var name = document.getElementById('edit-name').value.trim();
+  var from = document.getElementById('edit-from').value;
+  var to   = document.getElementById('edit-to').value || from;
+  var cat  = document.getElementById('edit-cat').value;
+  if (!name || !from) { showToast('Vul alle verplichte velden in.', 'error'); return; }
+  getToken().then(function(tok) {
+    return fetch(LIST_API + '/' + editingId + '/fields', {
+      method: 'PATCH',
+      headers: { 'Authorization': 'Bearer ' + tok, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Title: name, DateFrom: from, DateTo: to, Category: cat, Emoji: selectedEditEmoji })
+    });
+  }).then(function(r) {
+    if (!r.ok) throw new Error('Status ' + r.status);
+    closeModal();
+    showToast('Event bijgewerkt! ✅', 'success');
+    loadEvents();
+  }).catch(function(e) {
+    showToast('Fout: ' + e.message, 'error');
+  });
+}
+
+// ── VERWIJDEREN ─────────────────────────────────────────
+function deleteEvent(id) {
+  var ev = allEvents.find(function(e) { return e.id === id; });
+  if (!ev || !confirm('Event "' + ev.Title + '" verwijderen?')) return;
+  getToken().then(function(tok) {
+    return fetch(LIST_API + '/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + tok }
+    });
+  }).then(function() {
+    showToast('Event verwijderd.', 'success');
+    loadEvents();
+  }).catch(function(e) {
+    showToast('Fout: ' + e.message, 'error');
+  });
+}
+
+// ── TOAST ───────────────────────────────────────────────
+var toastTimer;
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'success') + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+// Sluit modal bij klik buiten
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
