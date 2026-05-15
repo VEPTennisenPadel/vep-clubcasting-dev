@@ -11,6 +11,68 @@ var CFG = {
 };
 
 // ─────────────────────────────────────────────────────────
+// FULLSCREEN
+// ─────────────────────────────────────────────────────────
+var isFullscreen = false;
+
+function toggleFullscreen() {
+  var wrap = document.getElementById('editor-wrap');
+  var p3 = document.getElementById('p3');
+  var btn = document.getElementById('fs-btn');
+  if (!isFullscreen) {
+    // Ga fullscreen
+    isFullscreen = true;
+    wrap.classList.add('editor-fullscreen');
+    p3.classList.add('editor-fullscreen-active');
+    btn.textContent = '✕';
+    btn.title = 'Sluiten';
+    // Probeer browser fullscreen API
+    var el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    // Herrender canvas op nieuwe afmetingen
+    setTimeout(function() { if(canvas) render(); }, 100);
+  } else {
+    exitFullscreen();
+  }
+}
+
+function exitFullscreen() {
+  var wrap = document.getElementById('editor-wrap');
+  var p3 = document.getElementById('p3');
+  var btn = document.getElementById('fs-btn');
+  isFullscreen = false;
+  wrap.classList.remove('editor-fullscreen');
+  p3.classList.remove('editor-fullscreen-active');
+  btn.textContent = '⛶';
+  btn.title = 'Volledig scherm';
+  // Verlaat browser fullscreen
+  if (document.exitFullscreen) document.exitFullscreen();
+  else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  setTimeout(function() { if(canvas) render(); }, 100);
+}
+
+// Sluit fullscreen als gebruiker Escape drukt of browser fullscreen verlaat
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement && isFullscreen) exitFullscreen();
+});
+document.addEventListener('webkitfullscreenchange', function() {
+  if (!document.webkitFullscreenElement && isFullscreen) exitFullscreen();
+});
+
+// Automatisch fullscreen bij eerste gebruikersactie op mobiel
+var autoFullscreenDone = false;
+function tryAutoFullscreen() {
+  if (autoFullscreenDone) return;
+  // Alleen op mobiel (smallere schermen)
+  if (window.innerWidth > 768) return;
+  autoFullscreenDone = true;
+  var el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(function(){});
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+}
+
+// ─────────────────────────────────────────────────────────
 // HELP
 // ─────────────────────────────────────────────────────────
 function toggleHelp(id) {
@@ -243,6 +305,7 @@ function onDrop(e){e.preventDefault();onDragLeave();addFiles(e.dataTransfer.file
 // NAVIGATIE
 // ─────────────────────────────────────────────────────────
 function goStep(n) {
+  tryAutoFullscreen();
   if(n===2&&!document.getElementById('in-name').value.trim()){showErr('Vul je naam in.');return;}
   var customEvent = document.getElementById('in-custom-event') ? document.getElementById('in-custom-event').value.trim() : '';
   if(n===2&&!selectedEvent&&!customEvent){showErr('Kies een event of vul een eventnaam in.');return;}

@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.15</title>
+<title>VEP Foto Upload v2.17</title>
 <link rel="stylesheet" href="vep-upload-app.css">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="../shared/vep-icon.svg">
 <link rel="icon" type="image/svg+xml" href="../shared/vep-icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,7 +20,7 @@
     <div class="logo"><img src="../shared/vep-icon.svg" style="width:42px;height:42px;border-radius:10px;display:block"></div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.15</span>
+    <span class="badge badge-b">v2.17</span>
   </div>
 
   <!-- STAPPEN -->
@@ -135,7 +136,10 @@
       </div>
       <div class="field">
         <label>Slide editor</label>
-        <div class="editor-wrap" id="editor-wrap"><canvas id="C"></canvas></div>
+        <div class="editor-wrap" id="editor-wrap">
+          <canvas id="C"></canvas>
+          <button class="fs-btn" id="fs-btn" onclick="toggleFullscreen()" title="Volledig scherm">⛶</button>
+        </div>
         <div class="editor-hint">
           <span>🖱️ Sleep op foto = verschuif uitsnede</span>
           <span>⌨️ Ctrl + scroll = zoom foto</span>
@@ -192,6 +196,12 @@
     <div class="btn-row">
       <button class="btn-s" onclick="goStep(2)">← Terug</button>
       <button class="btn-p" onclick="goStep(4)">📊 Slide maken →</button>
+    </div>
+    <!-- Fullscreen toolbar (zichtbaar in fullscreen modus) -->
+    <div class="fs-toolbar">
+      <button class="btn-s" onclick="exitFullscreen();goStep(2)">← Terug</button>
+      <button class="btn-p" onclick="exitFullscreen();goStep(4)">📊 Slide maken →</button>
+      <button class="btn-s" onclick="exitFullscreen()" style="margin-left:auto">✕ Sluiten</button>
     </div>
   </div>
 

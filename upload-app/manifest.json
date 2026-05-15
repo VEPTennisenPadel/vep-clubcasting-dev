@@ -1,0 +1,19 @@
+{
+  "name": "VEP Foto Compilatie",
+  "short_name": "VEP Foto",
+  "description": "Upload foto's van VEP events naar de clubcasting",
+  "start_url": "/vep-clubcasting/upload-app/",
+  "scope": "/vep-clubcasting/upload-app/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#226FB7",
+  "theme_color": "#226FB7",
+  "icons": [
+    {
+      "src": "../shared/vep-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
