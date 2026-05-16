@@ -567,7 +567,7 @@ function render() {
   // Teken swap knoppen bovenop alle foto's (buiten translate/rotate context)
   if(tbEditing && photos.length > 1) {
     var cells = getPhotoCells();
-    var count = Math.min(imgs.length, cells.length);
+    var count = Math.min(photos.length, cells.length);
     for(var si=0; si<count; si++) {
       var btn = getSwapBtnPos(cells[si]);
       var isSelected = swapIdx === si;
@@ -644,9 +644,9 @@ function canvasXY(e) {
 function getTBRect() { return {x:TB.x, y:TB.y, w:TB.w, h:TB.h}; }
 
 function getResizeHandle(px,py) {
-  // Grotere touch zone op mobiel
   var isMobile = window.innerWidth <= 768;
-  var R=getTBRect(), m=isMobile?50:20;
+  var m = isMobile ? 30 : 16;
+  var R=getTBRect();
   var corners=[
     {name:'nw',x:R.x,y:R.y},{name:'ne',x:R.x+R.w,y:R.y},
     {name:'se',x:R.x+R.w,y:R.y+R.h},{name:'sw',x:R.x,y:R.y+R.h}
