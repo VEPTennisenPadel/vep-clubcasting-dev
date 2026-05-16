@@ -53,7 +53,7 @@ function exitFullscreen() {
   btn.textContent = '⛶';
   btn.title = 'Volledig scherm';
   // Verlaat browser fullscreen
-  if (document.exitFullscreen) document.exitFullscreen();
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
   else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
   // Zet oriëntatie terug naar portret
   if (screen.orientation && screen.orientation.unlock) {
@@ -388,10 +388,12 @@ function initEditor() {
 
   TB.opacity = 0.88;
   document.getElementById('tb-op').value = 88;
-  TB.w = parseInt(document.getElementById('tb-w').value)||1920;
+  TB.w = Math.round(CW * 0.5);
   TB.h = parseInt(document.getElementById('tb-h').value)||80;
   TB.y = CH - TB.h;
   TB.x = (CW - TB.w) / 2;
+  // Sync inputs met nieuwe breedte
+  document.getElementById('tb-w').value = TB.w;
 
   imgs = [];
   var pending = photos.length;
@@ -468,7 +470,7 @@ function render() {
   TB.textColor=document.getElementById('tb-textcolor').value;
   TB.w = Math.min(TB.w, CW);
   if(TB.y===null || TB.y > CH || TB.y < -TB.h) TB.y = CH - TB.h;
-  if(TB.x===null || TB.x > CW) TB.x = (CW - TB.w) / 2;
+  if(TB.x===null || TB.x > CW) TB.x = Math.round((CW - TB.w) / 2);
 
   ctx.clearRect(0,0,CW,CH);
   ctx.fillStyle='#0A0A14'; ctx.fillRect(0,0,CW,CH);
@@ -630,10 +632,18 @@ function hexToRgba(hex,a){
 // ─────────────────────────────────────────────────────────
 function canvasXY(e) {
   var rect=canvas.getBoundingClientRect();
-  var sx=CW/rect.width, sy=CH/rect.height;
-  var cx=e.clientX||e.touches&&e.touches[0].clientX;
-  var cy=e.clientY||e.touches&&e.touches[0].clientY;
-  return {x:(cx-rect.left)*sx, y:(cy-rect.top)*sy};
+  // Gebruik werkelijke canvas display afmetingen
+  var displayW = rect.width;
+  var displayH = rect.height;
+  var sx = CW / displayW;
+  var sy = CH / displayH;
+  var touch = e.touches && e.touches[0];
+  var cx = touch ? touch.clientX : e.clientX;
+  var cy = touch ? touch.clientY : e.clientY;
+  // Corrigeer voor scroll positie
+  var x = (cx - rect.left) * sx;
+  var y = (cy - rect.top) * sy;
+  return {x: x, y: y};
 }
 
 function getTBRect() { return {x:TB.x, y:TB.y, w:TB.w, h:TB.h}; }
@@ -654,10 +664,7 @@ function getResizeHandle(px,py) {
 
 function hitTestTB(px,py){
   var R=getTBRect();
-  // Vergroot raakzone op mobiel met 20px aan alle kanten
-  var isMobile = window.innerWidth <= 768;
-  var m = isMobile ? 20 : 0;
-  return px>=R.x-m&&px<=R.x+R.w+m&&py>=R.y-m&&py<=R.y+R.h+m;
+  return px>=R.x&&px<=R.x+R.w&&py>=R.y&&py<=R.y+R.h;
 }
 
 function hitTestPhoto(px,py){
@@ -694,15 +701,20 @@ function onMouseDown(e) {
   // Klik buiten swap-knop annuleert swap modus
   if(swapIdx >= 0) { swapIdx = -1; render(); }
 
+  // Titelbalk heeft altijd prioriteit boven foto's
+  // Check resize handles eerst (hoeken van titelbalk)
   var handle=getResizeHandle(pos.x,pos.y);
   if(handle){
     interaction={type:'tb-resize',handle:handle,startX:pos.x,startY:pos.y,startTBx:TB.x,startTBy:TB.y,startTBw:TB.w,startTBh:TB.h};
     return;
   }
+  // Check titelbalk body
   if(hitTestTB(pos.x,pos.y)){
     interaction={type:'tb',startX:pos.x,startY:pos.y,startTBx:TB.x,startTBy:TB.y};
+    canvas.style.cursor='grabbing';
     return;
   }
+  // Foto's alleen als titelbalk niet geraakt
   var idx=hitTestPhoto(pos.x,pos.y);
   if(idx>=0){
     interaction={type:'photo',idx:idx,startX:pos.x,startY:pos.y,startOx:cropState[idx].ox||0,startOy:cropState[idx].oy||0};
@@ -810,8 +822,8 @@ document.addEventListener('DOMContentLoaded',function(){
 
   c.addEventListener('touchmove', function(e) {
     e.preventDefault();
-    if (e.touches.length === 1) {
-      onMouseMove({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY});
+    if (e.touches.length === 1 && e.touches[0]) {
+      onMouseMove({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY, touches:e.touches});
     } else if (e.touches.length === 2 && lastTouchDist !== null) {
       var dx = e.touches[0].clientX - e.touches[1].clientX;
       var dy = e.touches[0].clientY - e.touches[1].clientY;
@@ -828,7 +840,12 @@ document.addEventListener('DOMContentLoaded',function(){
   }, {passive:false});
 
   c.addEventListener('touchend', function(e) {
-    if (e.touches.length === 0) { onMouseUp(); lastTouchDist = null; }
+    onMouseUp();
+    lastTouchDist = null;
+  });
+  c.addEventListener('touchcancel', function(e) {
+    onMouseUp();
+    lastTouchDist = null;
   });
 });
 
@@ -927,7 +944,7 @@ function setTextColorCustom(v){
 // ─────────────────────────────────────────────────────────
 function resetApp(){
   photos=[];imgs=[];cropState=[];selectedLayout='full';selectedStyle='elegant';
-  TB={x:0,y:null,w:1920,h:80,rot:0,opacity:0.88,color:'#050514',textColor:'#ffffff'};
+  TB={x:Math.round((CW-CW*0.5)/2),y:null,w:Math.round(CW*0.5),h:80,rot:0,opacity:0.88,color:'#050514',textColor:'#ffffff'};
   tbEditing=true;
   swapIdx=-1;
   document.getElementById('in-name').value='';

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.19</title>
+<title>VEP Foto Upload v2.22</title>
 <link rel="stylesheet" href="vep-upload-app.css">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="../shared/vep-icon.svg">
@@ -20,7 +20,7 @@
     <div class="logo"><img src="../shared/vep-icon.svg" style="width:42px;height:42px;border-radius:10px;display:block"></div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.19</span>
+    <span class="badge badge-b">v2.22</span>
   </div>
 
   <!-- STAPPEN -->
@@ -158,7 +158,7 @@
       <div class="tb-panel">
         <h4>Titelbalk instellingen</h4>
         <div class="tb-grid">
-          <div class="tb-field"><label>Breedte (px)</label><input type="number" id="tb-w" value="1920" min="200" max="1920" oninput="render()"></div>
+          <div class="tb-field"><label>Breedte (px)</label><input type="number" id="tb-w" value="960" min="200" max="1920" oninput="render()"></div>
           <div class="tb-field"><label>Hoogte (px)</label><input type="number" id="tb-h" value="80" min="30" max="300" oninput="render()"></div>
         </div>
         <div class="tb-grid">
@@ -205,12 +205,8 @@
       <button class="btn-s" onclick="goStep(2)">← Terug</button>
       <button class="btn-p" onclick="goStep(4)">📊 Slide maken →</button>
     </div>
-    <!-- Fullscreen toolbar (zichtbaar in fullscreen modus) -->
-    <div class="fs-toolbar">
-      <button class="btn-s" onclick="exitFullscreen();goStep(2)">← Terug</button>
-      <button class="btn-p" onclick="exitFullscreen();goStep(4)">📊 Slide maken →</button>
-      <button class="btn-s" onclick="exitFullscreen()" style="margin-left:auto">✕ Sluiten</button>
-    </div>
+    <!-- Fullscreen sluitknop (rechtsboven, zichtbaar in fullscreen modus) -->
+    <button class="fs-close-btn" id="fs-close-btn" onclick="exitFullscreen()">✕ Sluiten</button>
   </div>
 
   <!-- STAP 4: VERZENDEN -->
