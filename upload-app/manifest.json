@@ -1,9 +1,9 @@
 {
-  "name": "VEP Foto Compilatie",
+  "name": "VEP Foto Compilatie (Test)",
   "short_name": "VEP Test",
   "description": "Upload foto's van VEP events naar de clubcasting",
-  "start_url": "/vep-clubcasting/upload-app/",
-  "scope": "/vep-clubcasting/upload-app/",
+  "start_url": "/vep-clubcasting-dev/upload-app/",
+  "scope": "/vep-clubcasting-dev/upload-app/",
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#f59e0b",
