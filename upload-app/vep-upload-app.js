@@ -565,7 +565,7 @@ function render() {
   ctx.restore();
 
   // Teken swap knoppen bovenop alle foto's (buiten translate/rotate context)
-  if(tbEditing && imgs.length > 1) {
+  if(tbEditing && photos.length > 1) {
     var cells = getPhotoCells();
     var count = Math.min(imgs.length, cells.length);
     for(var si=0; si<count; si++) {
@@ -714,15 +714,15 @@ function onMouseDown(e) {
   }
 }
 
-// Swap knop positie per foto (rechtsbovenhoek van cel)
+// Swap knop positie per foto (midden-onder in elke cel)
 function getSwapBtnPos(cell) {
   var isMobile = window.innerWidth <= 768;
-  var size = isMobile ? 80 : 60;
-  return { x: cell.x + cell.w - size/2, y: cell.y + size/2, r: size/2 };
+  var r = isMobile ? 45 : 32;
+  return { x: cell.x + cell.w/2, y: cell.y + cell.h - r - 10, r: r };
 }
 
 function hitTestSwapBtn(px, py) {
-  if(imgs.length <= 1) return -1; // Geen swap bij 1 foto
+  if(photos.length <= 1) return -1; // Geen swap bij 1 foto
   var cells = getPhotoCells();
   var count = Math.min(imgs.length, cells.length);
   for(var i=0; i<count; i++) {
@@ -766,8 +766,13 @@ function onMouseMove(e) {
     render();
   }
 
-  if(!interaction) {
-    var cur = 'default';
+  // Cursor altijd updaten
+  var cur = 'default';
+  if(interaction) {
+    if(interaction.type==='photo') cur = 'grabbing';
+    else if(interaction.type==='tb') cur = 'grabbing';
+    else if(interaction.type==='tb-resize') cur = 'nwse-resize';
+  } else {
     if(hitTestSwapBtn(pos.x,pos.y) >= 0) cur = 'pointer';
     else {
       var hh = getResizeHandle(pos.x,pos.y);
@@ -775,10 +780,8 @@ function onMouseMove(e) {
       else if(hitTestTB(pos.x,pos.y)) cur = 'move';
       else if(hitTestPhoto(pos.x,pos.y) >= 0) cur = 'grab';
     }
-    canvas.style.cursor = cur;
-  } else {
-    if(interaction.type==='tb') canvas.style.cursor='grabbing';
   }
+  canvas.style.cursor = cur;
 }
 
 function onMouseUp() { interaction=null; }
