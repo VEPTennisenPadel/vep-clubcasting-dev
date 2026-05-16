@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.32</title>
+<title>VEP Foto Upload v2.33</title>
 <link rel="stylesheet" href="vep-upload-app.css">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="../shared/vep-icon.svg">
@@ -20,7 +20,7 @@
     <div class="logo"><img src="../shared/vep-icon.svg" style="width:42px;height:42px;border-radius:10px;display:block"></div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.32</span>
+    <span class="badge badge-b">v2.33</span>
   </div>
 
   <!-- STAPPEN -->
@@ -151,8 +151,14 @@
         <div class="editor-hint">
           <span>🖱️ Sleep op foto = verschuif uitsnede</span>
           <span>⌨️ Ctrl + scroll = zoom foto</span>
-          <span>✋ Sleep titelbalk = verplaats</span>
-          <span>↔️ Sleep rand titelbalk = resize</span>
+          <span>👌 Pinch = zoom op mobiel</span>
+        </div>
+        <div id="wissel-wrap" style="display:none;margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:13px;color:var(--m)">Foto</span>
+          <input type="number" id="wissel-van" min="1" max="20" placeholder="1" style="width:56px;padding:6px 8px;font-size:14px;border:1px solid #d1d5db;border-radius:var(--r);text-align:center">
+          <span style="font-size:13px;color:var(--m)">↔ naar frame</span>
+          <input type="number" id="wissel-naar" min="1" max="20" placeholder="2" style="width:56px;padding:6px 8px;font-size:14px;border:1px solid #d1d5db;border-radius:var(--r);text-align:center">
+          <button class="btn-p" onclick="wisselFoto()" style="flex:none;padding:7px 14px;font-size:13px">↔ Wissel</button>
         </div>
       </div>
       <div class="tb-panel">
