@@ -232,11 +232,11 @@ var photos = [];
 var imgs = [];
 var cropState = [];
 var selectedEvent = '';
-var selectedLayout = 'full';
+var selectedLayout = 'auto';
 var selectedStyle = 'elegant';
 
 // Titelbalk state
-var TB = { x:0, y:null, w:1920, h:80, rot:0, opacity:0.88, color:'#050514', textColor:'#ffffff' };
+var TB = { x:0, y:null, w:Math.round(1920*0.5), h:160, rot:0, opacity:0.88, color:'#050514', textColor:'#ffffff' };
 var tbEditing = true;
 
 // ─────────────────────────────────────────────────────────
@@ -391,7 +391,7 @@ function initEditor() {
   TB.opacity = 0.88;
   document.getElementById('tb-op').value = 88;
   TB.w = Math.round(CW * 0.5);
-  TB.h = parseInt(document.getElementById('tb-h').value)||80;
+  TB.h = parseInt(document.getElementById('tb-h').value)||160;
   TB.y = CH - TB.h;
   TB.x = (CW - TB.w) / 2;
   // Sync inputs met nieuwe breedte
@@ -925,7 +925,7 @@ function wisselFoto() {
 // ─────────────────────────────────────────────────────────
 function resetApp(){
   photos=[];imgs=[];cropState=[];selectedLayout='full';selectedStyle='elegant';
-  TB={x:Math.round((CW-CW*0.5)/2),y:null,w:Math.round(CW*0.5),h:80,rot:0,opacity:0.88,color:'#050514',textColor:'#ffffff'};
+  TB={x:Math.round((CW-CW*0.5)/2),y:null,w:Math.round(CW*0.5),h:160,rot:0,opacity:0.88,color:'#050514',textColor:'#ffffff'};
   tbEditing=true;
   tbSelected=false;
   swapIdx=-1;
