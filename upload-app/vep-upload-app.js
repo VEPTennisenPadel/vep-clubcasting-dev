@@ -693,9 +693,14 @@ document.addEventListener('DOMContentLoaded',function(){
   var lastTouchDist = null;
   var lastTouchMid  = null;
 
+  var pinchStartDist = null;
+  var pinchIdx = -1;
+  var pinchStartZoom = 1;
+
   c.addEventListener('touchstart', function(e) {
     e.preventDefault();
     if (e.touches.length === 1) {
+      // Schuiven
       var t = e.touches[0];
       var pos = canvasXY({clientX:t.clientX, clientY:t.clientY});
       var idx = hitTestPhoto(pos.x, pos.y);
@@ -703,12 +708,28 @@ document.addEventListener('DOMContentLoaded',function(){
         interaction = {type:'photo', idx:idx, startX:pos.x, startY:pos.y,
           startOx:cropState[idx].ox||0, startOy:cropState[idx].oy||0};
       }
+      pinchStartDist = null;
+    } else if (e.touches.length === 2) {
+      // Pinch zoom start
+      interaction = null;
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchStartDist = Math.sqrt(dx*dx + dy*dy);
+      // Bepaal welke foto geraakt wordt via het midden tussen de vingers
+      var mid = {
+        clientX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        clientY: (e.touches[0].clientY + e.touches[1].clientY) / 2
+      };
+      var pos = canvasXY(mid);
+      pinchIdx = hitTestPhoto(pos.x, pos.y);
+      pinchStartZoom = pinchIdx >= 0 ? (cropState[pinchIdx].zoom || 1) : 1;
     }
   }, {passive:false});
 
   c.addEventListener('touchmove', function(e) {
     e.preventDefault();
     if (e.touches.length === 1 && interaction && interaction.type==='photo') {
+      // Schuiven
       var t = e.touches[0];
       var pos = canvasXY({clientX:t.clientX, clientY:t.clientY});
       var dx = pos.x - interaction.startX;
@@ -716,11 +737,27 @@ document.addEventListener('DOMContentLoaded',function(){
       cropState[interaction.idx].ox = interaction.startOx + dx;
       cropState[interaction.idx].oy = interaction.startOy + dy;
       render();
+    } else if (e.touches.length === 2 && pinchStartDist !== null && pinchIdx >= 0) {
+      // Pinch zoom
+      var dx = e.touches[0].clientX - e.touches[1].clientX;
+      var dy = e.touches[0].clientY - e.touches[1].clientY;
+      var newDist = Math.sqrt(dx*dx + dy*dy);
+      var scale = newDist / pinchStartDist;
+      cropState[pinchIdx].zoom = Math.max(0.5, Math.min(5, pinchStartZoom * scale));
+      render();
     }
   }, {passive:false});
 
-  c.addEventListener('touchend', function() { interaction = null; });
-  c.addEventListener('touchcancel', function() { interaction = null; });
+  c.addEventListener('touchend', function(e) {
+    if (e.touches.length === 0) {
+      interaction = null;
+      pinchStartDist = null;
+    }
+  });
+  c.addEventListener('touchcancel', function() {
+    interaction = null;
+    pinchStartDist = null;
+  });
 });
 
 // ─────────────────────────────────────────────────────────
