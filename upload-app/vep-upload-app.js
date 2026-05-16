@@ -767,6 +767,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var lastTouchMid  = null;
 
   c.addEventListener('touchstart', function(e) {
+    e.preventDefault(); // Voorkom browser scroll/zoom interferentie
     if (e.touches.length === 1) {
       onMouseDown({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY, button:0});
       lastTouchDist = null;
@@ -777,7 +778,7 @@ document.addEventListener('DOMContentLoaded',function(){
       lastTouchMid = { clientX:(e.touches[0].clientX+e.touches[1].clientX)/2, clientY:(e.touches[0].clientY+e.touches[1].clientY)/2 };
       interaction = null;
     }
-  }, {passive:true});
+  }, {passive:false});
 
   c.addEventListener('touchmove', function(e) {
     e.preventDefault();
