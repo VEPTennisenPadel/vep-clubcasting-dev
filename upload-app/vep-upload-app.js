@@ -329,6 +329,7 @@ function goStep(n) {
   if(n===4) {
     interaction = null;
     tbEditing = false;
+    tbSelected = false;
     if(canvas) render();
   } else {
     tbEditing = true;
@@ -385,6 +386,7 @@ function initEditor() {
   ctx = canvas.getContext('2d');
   canvas.width = CW; canvas.height = CH;
   tbEditing = true;
+  tbSelected = false;
 
   TB.opacity = 0.88;
   document.getElementById('tb-op').value = 88;
@@ -552,8 +554,8 @@ function render() {
     ctx.fillText(memberName, TB.w/2-marginX, TB.h/2-marginY);
   }
 
-  // Handvatten alleen tonen in stap 3
-  if(tbEditing) {
+  // Handvatten alleen tonen als titelbalk geselecteerd is
+  if(tbEditing && tbSelected) {
     ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.setLineDash([6,6]);
     ctx.strokeRect(-TB.w/2,-TB.h/2,TB.w,TB.h); ctx.setLineDash([]);
     [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(c){
@@ -691,21 +693,28 @@ function onMouseDown(e) {
   }
   if(swapIdx >= 0) { swapIdx = -1; render(); }
 
-  // 2. Resize hoeken titelbalk
-  var handle = getResizeHandle(pos.x, pos.y);
-  if(handle) {
-    interaction = {type:'tb-resize', handle:handle, startX:pos.x, startY:pos.y,
-      startTBx:TB.x, startTBy:TB.y, startTBw:TB.w, startTBh:TB.h};
-    return;
+  // 2. Resize hoeken titelbalk (alleen als geselecteerd)
+  if(tbSelected) {
+    var handle = getResizeHandle(pos.x, pos.y);
+    if(handle) {
+      interaction = {type:'tb-resize', handle:handle, startX:pos.x, startY:pos.y,
+        startTBx:TB.x, startTBy:TB.y, startTBw:TB.w, startTBh:TB.h};
+      return;
+    }
   }
 
-  // 3. Titelbalk body slepen
+  // 3. Titelbalk body — selecteer en sleep
   if(hitTestTB(pos.x, pos.y)) {
+    tbSelected = true;
     interaction = {type:'tb', startX:pos.x, startY:pos.y, startTBx:TB.x, startTBy:TB.y};
+    render();
     return;
   }
 
-  // 4. Foto verschuiven
+  // 4. Klik buiten titelbalk — deselecteer
+  tbSelected = false;
+
+  // 5. Foto verschuiven
   var idx = hitTestPhoto(pos.x, pos.y);
   if(idx >= 0) {
     interaction = {type:'photo', idx:idx, startX:pos.x, startY:pos.y,
@@ -947,6 +956,7 @@ function resetApp(){
   photos=[];imgs=[];cropState=[];selectedLayout='full';selectedStyle='elegant';
   TB={x:Math.round((CW-CW*0.5)/2),y:null,w:Math.round(CW*0.5),h:80,rot:0,opacity:0.88,color:'#050514',textColor:'#ffffff'};
   tbEditing=true;
+  tbSelected=false;
   swapIdx=-1;
   document.getElementById('in-name').value='';
   document.getElementById('in-caption').value='';
