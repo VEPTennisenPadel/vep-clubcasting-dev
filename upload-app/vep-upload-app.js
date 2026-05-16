@@ -20,7 +20,6 @@ function toggleFullscreen() {
   var p3 = document.getElementById('p3');
   var btn = document.getElementById('fs-btn');
   if (!isFullscreen) {
-    // Ga fullscreen
     isFullscreen = true;
     wrap.classList.add('editor-fullscreen');
     p3.classList.add('editor-fullscreen-active');
@@ -30,8 +29,15 @@ function toggleFullscreen() {
     var el = document.documentElement;
     if (el.requestFullscreen) el.requestFullscreen();
     else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    // Herrender canvas op nieuwe afmetingen
-    setTimeout(function() { if(canvas) render(); }, 100);
+    // Forceer liggende stand op mobiel
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(function(){});
+    } else if (window.screen.lockOrientation) {
+      window.screen.lockOrientation('landscape');
+    } else if (window.screen.mozLockOrientation) {
+      window.screen.mozLockOrientation('landscape');
+    }
+    setTimeout(function() { if(canvas) render(); }, 300);
   } else {
     exitFullscreen();
   }
@@ -49,7 +55,15 @@ function exitFullscreen() {
   // Verlaat browser fullscreen
   if (document.exitFullscreen) document.exitFullscreen();
   else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-  setTimeout(function() { if(canvas) render(); }, 100);
+  // Zet oriëntatie terug naar portret
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
+  } else if (window.screen.unlockOrientation) {
+    window.screen.unlockOrientation();
+  } else if (window.screen.mozUnlockOrientation) {
+    window.screen.mozUnlockOrientation();
+  }
+  setTimeout(function() { if(canvas) render(); }, 300);
 }
 
 // Sluit fullscreen als gebruiker Escape drukt of browser fullscreen verlaat

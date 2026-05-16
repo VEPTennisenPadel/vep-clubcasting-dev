@@ -5,7 +5,7 @@
   "start_url": "/vep-clubcasting-dev/upload-app/",
   "scope": "/vep-clubcasting-dev/upload-app/",
   "display": "fullscreen",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#f59e0b",
   "theme_color": "#f59e0b",
   "icons": [
