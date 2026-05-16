@@ -565,21 +565,27 @@ function render() {
     for(var fi=0; fi<count; fi++) {
       var cell = cells[fi];
       var nr = fi + 1;
-      var fs2 = Math.min(cell.w, cell.h) * 0.18;
-      fs2 = Math.max(24, Math.min(fs2, 80));
-      var pad = fs2 * 0.4;
-      // Achtergrond cirkel
+      // Vaste grootte ongeacht celgrootte
+      var r = 30;
+      var cx2 = cell.x + r + 12;
+      var cy2 = cell.y + r + 12;
+      // Schaduw voor zichtbaarheid
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 6;
+      // Cirkel
       ctx.beginPath();
-      ctx.arc(cell.x + pad + fs2*0.5, cell.y + pad + fs2*0.5, fs2*0.65, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(34,111,183,0.85)';
+      ctx.arc(cx2, cy2, r, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(34,111,183,0.92)';
       ctx.fill();
+      ctx.shadowBlur = 0;
       // Nummer
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold ' + fs2 + 'px -apple-system,sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 28px -apple-system,sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(nr, cell.x + pad + fs2*0.5, cell.y + pad + fs2*0.5);
+      ctx.fillText(nr, cx2, cy2);
     }
+    ctx.shadowBlur = 0;
   }
   // Titelbalk handvatten tijdelijk uitgeschakeld
 
@@ -890,7 +896,8 @@ function wisselFoto() {
   var naar = parseInt(naarInput.value) - 1;
   var maxIdx = Math.min(photos.length, getPhotoCells().length) - 1;
 
-  if(isNaN(van) || isNaN(naar)) { alert('Vul twee framenummers in.'); return; }
+  if(!vanInput.value.trim() || !naarInput.value.trim() || isNaN(van) || isNaN(naar)) {
+    alert('Vul twee framenummers in.'); return; }
   if(van < 0 || van > maxIdx || naar < 0 || naar > maxIdx) {
     alert('Framenummers moeten tussen 1 en ' + (maxIdx+1) + ' liggen.'); return; }
   if(van === naar) { alert('Kies twee verschillende frames.'); return; }
