@@ -558,62 +558,6 @@ function render() {
 
   ctx.restore();
 
-  // Teken swap knoppen bovenop alle foto's (buiten translate/rotate context)
-  if(tbEditing && photos.length > 1) {
-    var cells = getPhotoCells();
-    var count = Math.min(photos.length, cells.length);
-    for(var si=0; si<count; si++) {
-      var btn = getSwapBtnPos(cells[si]);
-      var isSelected = swapIdx === si;
-      // Cirkel achtergrond
-      ctx.beginPath();
-      ctx.arc(btn.x, btn.y, btn.r, 0, Math.PI*2);
-      ctx.fillStyle = isSelected ? 'rgba(34,111,183,0.9)' : 'rgba(0,0,0,0.55)';
-      ctx.fill();
-      ctx.strokeStyle = isSelected ? '#EBD61F' : 'rgba(255,255,255,0.6)';
-      ctx.lineWidth = isSelected ? 3 : 1.5;
-      ctx.setLineDash([]);
-      ctx.stroke();
-      // Wissel-icoon (twee pijlen)
-      var s = btn.r * 0.45;
-      ctx.strokeStyle = isSelected ? '#EBD61F' : '#fff';
-      ctx.lineWidth = btn.r * 0.12;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      // Pijl links
-      ctx.beginPath();
-      ctx.moveTo(btn.x - s*0.2, btn.y - s*0.5);
-      ctx.lineTo(btn.x - s, btn.y - s*0.5);
-      ctx.lineTo(btn.x - s, btn.y + s*0.5);
-      ctx.lineTo(btn.x - s*0.2, btn.y + s*0.5);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(btn.x - s*0.7, btn.y - s*0.9);
-      ctx.lineTo(btn.x - s*0.2, btn.y - s*0.5);
-      ctx.lineTo(btn.x - s*0.7, btn.y - s*0.1);
-      ctx.stroke();
-      // Pijl rechts
-      ctx.beginPath();
-      ctx.moveTo(btn.x + s*0.2, btn.y + s*0.5);
-      ctx.lineTo(btn.x + s, btn.y + s*0.5);
-      ctx.lineTo(btn.x + s, btn.y - s*0.5);
-      ctx.lineTo(btn.x + s*0.2, btn.y - s*0.5);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(btn.x + s*0.7, btn.y + s*0.9);
-      ctx.lineTo(btn.x + s*0.2, btn.y + s*0.5);
-      ctx.lineTo(btn.x + s*0.7, btn.y + s*0.1);
-      ctx.stroke();
-      // Label
-      if(isSelected) {
-        ctx.fillStyle = '#EBD61F';
-        ctx.font = 'bold ' + Math.round(btn.r*0.35) + 'px -apple-system,sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillText('Kies foto', btn.x, btn.y + btn.r + 4);
-      }
-    }
-  }
 }
 
 function hexToRgba(hex,a){
@@ -669,28 +613,11 @@ function onMouseDown(e) {
   if(e.button===2) return;
   var pos=canvasXY(e);
 
-  // 1. Swap knop check
-  var swapBtnIdx = hitTestSwapBtn(pos.x, pos.y);
-  if(swapBtnIdx >= 0) {
-    if(swapIdx === -1) {
-      swapIdx = swapBtnIdx;
-    } else if(swapIdx === swapBtnIdx) {
-      swapIdx = -1;
-    } else {
-      swapPhotos(swapIdx, swapBtnIdx);
-      swapIdx = -1;
-    }
-    render();
-    return;
-  }
-  if(swapIdx >= 0) { swapIdx = -1; render(); }
-
-  // 2. Foto verschuiven — titelbalk interactie uitgeschakeld
+  // Foto verschuiven
   var idx = hitTestPhoto(pos.x, pos.y);
   if(idx >= 0) {
     interaction = {type:'photo', idx:idx, startX:pos.x, startY:pos.y,
       startOx:cropState[idx].ox||0, startOy:cropState[idx].oy||0};
-    return;
   }
 }
 
@@ -767,46 +694,33 @@ document.addEventListener('DOMContentLoaded',function(){
   var lastTouchMid  = null;
 
   c.addEventListener('touchstart', function(e) {
-    e.preventDefault(); // Voorkom browser scroll/zoom interferentie
+    e.preventDefault();
     if (e.touches.length === 1) {
-      onMouseDown({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY, button:0});
-      lastTouchDist = null;
-    } else if (e.touches.length === 2) {
-      var dx = e.touches[0].clientX - e.touches[1].clientX;
-      var dy = e.touches[0].clientY - e.touches[1].clientY;
-      lastTouchDist = Math.sqrt(dx*dx + dy*dy);
-      lastTouchMid = { clientX:(e.touches[0].clientX+e.touches[1].clientX)/2, clientY:(e.touches[0].clientY+e.touches[1].clientY)/2 };
-      interaction = null;
+      var t = e.touches[0];
+      var pos = canvasXY({clientX:t.clientX, clientY:t.clientY});
+      var idx = hitTestPhoto(pos.x, pos.y);
+      if (idx >= 0) {
+        interaction = {type:'photo', idx:idx, startX:pos.x, startY:pos.y,
+          startOx:cropState[idx].ox||0, startOy:cropState[idx].oy||0};
+      }
     }
   }, {passive:false});
 
   c.addEventListener('touchmove', function(e) {
     e.preventDefault();
-    if (e.touches.length === 1 && e.touches[0]) {
-      onMouseMove({clientX:e.touches[0].clientX, clientY:e.touches[0].clientY, touches:e.touches});
-    } else if (e.touches.length === 2 && lastTouchDist !== null) {
-      var dx = e.touches[0].clientX - e.touches[1].clientX;
-      var dy = e.touches[0].clientY - e.touches[1].clientY;
-      var newDist = Math.sqrt(dx*dx + dy*dy);
-      var scale = newDist / lastTouchDist;
-      lastTouchDist = newDist;
-      var pos = canvasXY(lastTouchMid);
-      var idx = hitTestPhoto(pos.x, pos.y);
-      if (idx >= 0) {
-        cropState[idx].zoom = Math.max(0.5, Math.min(5, (cropState[idx].zoom||1) * scale));
-        render();
-      }
+    if (e.touches.length === 1 && interaction && interaction.type==='photo') {
+      var t = e.touches[0];
+      var pos = canvasXY({clientX:t.clientX, clientY:t.clientY});
+      var dx = pos.x - interaction.startX;
+      var dy = pos.y - interaction.startY;
+      cropState[interaction.idx].ox = interaction.startOx + dx;
+      cropState[interaction.idx].oy = interaction.startOy + dy;
+      render();
     }
   }, {passive:false});
 
-  c.addEventListener('touchend', function(e) {
-    onMouseUp();
-    lastTouchDist = null;
-  });
-  c.addEventListener('touchcancel', function(e) {
-    onMouseUp();
-    lastTouchDist = null;
-  });
+  c.addEventListener('touchend', function() { interaction = null; });
+  c.addEventListener('touchcancel', function() { interaction = null; });
 });
 
 // ─────────────────────────────────────────────────────────
