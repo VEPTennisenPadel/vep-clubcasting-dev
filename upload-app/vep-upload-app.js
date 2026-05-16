@@ -554,15 +554,7 @@ function render() {
     ctx.fillText(memberName, TB.w/2-marginX, TB.h/2-marginY);
   }
 
-  // Handvatten alleen tonen als titelbalk geselecteerd is
-  if(tbEditing && tbSelected) {
-    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=2; ctx.setLineDash([6,6]);
-    ctx.strokeRect(-TB.w/2,-TB.h/2,TB.w,TB.h); ctx.setLineDash([]);
-    [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(function(c){
-      ctx.fillStyle='rgba(255,255,255,0.75)';
-      ctx.fillRect(c[0]*(TB.w/2)-6,c[1]*(TB.h/2)-6,12,12);
-    });
-  }
+  // Titelbalk handvatten tijdelijk uitgeschakeld
 
   ctx.restore();
 
@@ -693,28 +685,7 @@ function onMouseDown(e) {
   }
   if(swapIdx >= 0) { swapIdx = -1; render(); }
 
-  // 2. Resize hoeken titelbalk (alleen als geselecteerd)
-  if(tbSelected) {
-    var handle = getResizeHandle(pos.x, pos.y);
-    if(handle) {
-      interaction = {type:'tb-resize', handle:handle, startX:pos.x, startY:pos.y,
-        startTBx:TB.x, startTBy:TB.y, startTBw:TB.w, startTBh:TB.h};
-      return;
-    }
-  }
-
-  // 3. Titelbalk body — selecteer en sleep
-  if(hitTestTB(pos.x, pos.y)) {
-    tbSelected = true;
-    interaction = {type:'tb', startX:pos.x, startY:pos.y, startTBx:TB.x, startTBy:TB.y};
-    render();
-    return;
-  }
-
-  // 4. Klik buiten titelbalk — deselecteer
-  tbSelected = false;
-
-  // 5. Foto verschuiven
+  // 2. Foto verschuiven — titelbalk interactie uitgeschakeld
   var idx = hitTestPhoto(pos.x, pos.y);
   if(idx >= 0) {
     interaction = {type:'photo', idx:idx, startX:pos.x, startY:pos.y,
@@ -758,37 +729,15 @@ function onMouseMove(e) {
     cropState[interaction.idx].ox=interaction.startOx+dx;
     cropState[interaction.idx].oy=interaction.startOy+dy;
     render();
-  } else if(interaction.type==='tb'){
-    TB.x=interaction.startTBx+dx;
-    TB.y=interaction.startTBy+dy;
-    render();
-  } else if(interaction.type==='tb-resize'){
-    var h=interaction.handle;
-    var nx=interaction.startTBx, ny=interaction.startTBy, nw=interaction.startTBw, nh=interaction.startTBh;
-    if(h==='se'){nw=Math.max(200,nw+dx);nh=Math.max(30,nh+dy);}
-    else if(h==='sw'){nx=interaction.startTBx+dx;nw=Math.max(200,nw-dx);nh=Math.max(30,nh+dy);}
-    else if(h==='ne'){nw=Math.max(200,nw+dx);ny=interaction.startTBy+dy;nh=Math.max(30,nh-dy);}
-    else if(h==='nw'){nx=interaction.startTBx+dx;ny=interaction.startTBy+dy;nw=Math.max(200,nw-dx);nh=Math.max(30,nh-dy);}
-    TB.x=nx;TB.y=ny;TB.w=nw;TB.h=nh;
-    document.getElementById('tb-w').value=Math.round(nw);
-    document.getElementById('tb-h').value=Math.round(nh);
-    render();
   }
 
-  // Cursor altijd updaten
+  // Cursor
   var cur = 'default';
-  if(interaction) {
-    if(interaction.type==='photo') cur = 'grabbing';
-    else if(interaction.type==='tb') cur = 'grabbing';
-    else if(interaction.type==='tb-resize') cur = 'nwse-resize';
+  if(interaction && interaction.type==='photo') {
+    cur = 'grabbing';
   } else {
     if(hitTestSwapBtn(pos.x,pos.y) >= 0) cur = 'pointer';
-    else {
-      var hh = getResizeHandle(pos.x,pos.y);
-      if(hh) cur = (hh==='nw'||hh==='se') ? 'nwse-resize' : 'nesw-resize';
-      else if(hitTestTB(pos.x,pos.y)) cur = 'move';
-      else if(hitTestPhoto(pos.x,pos.y) >= 0) cur = 'grab';
-    }
+    else if(hitTestPhoto(pos.x,pos.y) >= 0) cur = 'grab';
   }
   canvas.style.cursor = cur;
 }
