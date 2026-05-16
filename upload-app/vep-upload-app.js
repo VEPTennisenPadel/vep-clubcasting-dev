@@ -23,7 +23,7 @@ function toggleFullscreen() {
     isFullscreen = true;
     wrap.classList.add('editor-fullscreen');
     p3.classList.add('editor-fullscreen-active');
-    btn.textContent = '✕';
+    btn.textContent = '✕ Sluiten';
     btn.title = 'Sluiten';
     // Probeer browser fullscreen API
     var el = document.documentElement;
@@ -631,19 +631,14 @@ function hexToRgba(hex,a){
 // CANVAS INTERACTIE
 // ─────────────────────────────────────────────────────────
 function canvasXY(e) {
-  var rect=canvas.getBoundingClientRect();
-  // Gebruik werkelijke canvas display afmetingen
-  var displayW = rect.width;
-  var displayH = rect.height;
-  var sx = CW / displayW;
-  var sy = CH / displayH;
-  var touch = e.touches && e.touches[0];
-  var cx = touch ? touch.clientX : e.clientX;
-  var cy = touch ? touch.clientY : e.clientY;
-  // Corrigeer voor scroll positie
-  var x = (cx - rect.left) * sx;
-  var y = (cy - rect.top) * sy;
-  return {x: x, y: y};
+  var rect = canvas.getBoundingClientRect();
+  var sx = CW / rect.width;
+  var sy = CH / rect.height;
+  var src = (e.touches && e.touches[0]) || e;
+  return {
+    x: (src.clientX - rect.left) * sx,
+    y: (src.clientY - rect.top) * sy
+  };
 }
 
 function getTBRect() { return {x:TB.x, y:TB.y, w:TB.w, h:TB.h}; }
@@ -680,44 +675,41 @@ function onMouseDown(e) {
   if(e.button===2) return;
   var pos=canvasXY(e);
 
-  // Controleer of swap-knop is aangeklikt
+  // 1. Swap knop check
   var swapBtnIdx = hitTestSwapBtn(pos.x, pos.y);
   if(swapBtnIdx >= 0) {
     if(swapIdx === -1) {
-      // Eerste foto geselecteerd
       swapIdx = swapBtnIdx;
     } else if(swapIdx === swapBtnIdx) {
-      // Zelfde foto — deselecteer
       swapIdx = -1;
     } else {
-      // Tweede foto — wissel
       swapPhotos(swapIdx, swapBtnIdx);
       swapIdx = -1;
     }
     render();
     return;
   }
-
-  // Klik buiten swap-knop annuleert swap modus
   if(swapIdx >= 0) { swapIdx = -1; render(); }
 
-  // Titelbalk heeft altijd prioriteit boven foto's
-  // Check resize handles eerst (hoeken van titelbalk)
-  var handle=getResizeHandle(pos.x,pos.y);
-  if(handle){
-    interaction={type:'tb-resize',handle:handle,startX:pos.x,startY:pos.y,startTBx:TB.x,startTBy:TB.y,startTBw:TB.w,startTBh:TB.h};
+  // 2. Resize hoeken titelbalk
+  var handle = getResizeHandle(pos.x, pos.y);
+  if(handle) {
+    interaction = {type:'tb-resize', handle:handle, startX:pos.x, startY:pos.y,
+      startTBx:TB.x, startTBy:TB.y, startTBw:TB.w, startTBh:TB.h};
     return;
   }
-  // Check titelbalk body
-  if(hitTestTB(pos.x,pos.y)){
-    interaction={type:'tb',startX:pos.x,startY:pos.y,startTBx:TB.x,startTBy:TB.y};
-    canvas.style.cursor='grabbing';
+
+  // 3. Titelbalk body slepen
+  if(hitTestTB(pos.x, pos.y)) {
+    interaction = {type:'tb', startX:pos.x, startY:pos.y, startTBx:TB.x, startTBy:TB.y};
     return;
   }
-  // Foto's alleen als titelbalk niet geraakt
-  var idx=hitTestPhoto(pos.x,pos.y);
-  if(idx>=0){
-    interaction={type:'photo',idx:idx,startX:pos.x,startY:pos.y,startOx:cropState[idx].ox||0,startOy:cropState[idx].oy||0};
+
+  // 4. Foto verschuiven
+  var idx = hitTestPhoto(pos.x, pos.y);
+  if(idx >= 0) {
+    interaction = {type:'photo', idx:idx, startX:pos.x, startY:pos.y,
+      startOx:cropState[idx].ox||0, startOy:cropState[idx].oy||0};
     return;
   }
 }
@@ -774,13 +766,19 @@ function onMouseMove(e) {
     render();
   }
 
-  var cur='default';
-  if(hitTestSwapBtn(pos.x,pos.y)>=0) cur='pointer';
-  var hh=getResizeHandle(pos.x,pos.y);
-  if(hh) cur=hh==='nw'||hh==='se'?'nwse-resize':'nesw-resize';
-  else if(hitTestTB(pos.x,pos.y)) cur='move';
-  else if(hitTestPhoto(pos.x,pos.y)>=0) cur='grab';
-  canvas.style.cursor=cur;
+  if(!interaction) {
+    var cur = 'default';
+    if(hitTestSwapBtn(pos.x,pos.y) >= 0) cur = 'pointer';
+    else {
+      var hh = getResizeHandle(pos.x,pos.y);
+      if(hh) cur = (hh==='nw'||hh==='se') ? 'nwse-resize' : 'nesw-resize';
+      else if(hitTestTB(pos.x,pos.y)) cur = 'move';
+      else if(hitTestPhoto(pos.x,pos.y) >= 0) cur = 'grab';
+    }
+    canvas.style.cursor = cur;
+  } else {
+    if(interaction.type==='tb') canvas.style.cursor='grabbing';
+  }
 }
 
 function onMouseUp() { interaction=null; }

@@ -160,7 +160,5 @@ input[type=color]{width:36px;height:28px;padding:2px;border:1px solid #d1d5db;bo
 .editor-fullscreen-active .tb-panel{display:none}
 .editor-fullscreen-active .editor-hint{display:none}
 
-/* Sluitknop rechtsboven in fullscreen */
-.fs-close-btn{display:none;position:fixed;top:12px;right:12px;z-index:9001;padding:8px 16px;border-radius:var(--r);background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
-.fs-close-btn:hover{background:rgba(0,0,0,.85)}
-.editor-fullscreen-active .fs-close-btn{display:block}
+/* fs-btn: in fullscreen rechtsboven als sluitknop */
+.editor-fullscreen .fs-btn{bottom:auto;top:12px;right:12px;width:auto;height:auto;padding:8px 14px;font-size:14px;border-radius:var(--r);font-weight:600}
