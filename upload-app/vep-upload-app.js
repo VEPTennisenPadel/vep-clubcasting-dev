@@ -715,13 +715,16 @@ document.addEventListener('DOMContentLoaded',function(){
       var dx = e.touches[0].clientX - e.touches[1].clientX;
       var dy = e.touches[0].clientY - e.touches[1].clientY;
       pinchStartDist = Math.sqrt(dx*dx + dy*dy);
-      // Bepaal welke foto geraakt wordt via het midden tussen de vingers
+      // Gebruik eerste beschikbare foto
+      pinchIdx = cropState.length > 0 ? 0 : -1;
+      // Probeer ook via hitTest midden tussen vingers
       var mid = {
         clientX: (e.touches[0].clientX + e.touches[1].clientX) / 2,
         clientY: (e.touches[0].clientY + e.touches[1].clientY) / 2
       };
       var pos = canvasXY(mid);
-      pinchIdx = hitTestPhoto(pos.x, pos.y);
+      var hitIdx = hitTestPhoto(pos.x, pos.y);
+      if (hitIdx >= 0) pinchIdx = hitIdx;
       pinchStartZoom = pinchIdx >= 0 ? (cropState[pinchIdx].zoom || 1) : 1;
     }
   }, {passive:false});
