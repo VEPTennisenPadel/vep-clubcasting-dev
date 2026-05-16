@@ -558,8 +558,8 @@ function render() {
     ctx.fillText(memberName, TB.w/2-marginX, TB.h/2-marginY);
   }
 
-  // Teken framenummers in elk frame
-  if(tbEditing && photos.length > 1) {
+  // Teken framenummers altijd in stap 3
+  if(photos.length > 1) {
     var cells = getPhotoCells();
     var count = Math.min(photos.length, cells.length);
     for(var fi=0; fi<count; fi++) {
@@ -897,13 +897,20 @@ function wisselFoto() {
 
   // Wissel foto's en cropState
   var tmpPhoto = photos[van]; photos[van] = photos[naar]; photos[naar] = tmpPhoto;
-  var tmpImg = imgs[van]; imgs[van] = imgs[naar]; imgs[naar] = tmpImg;
   var tmpCrop = cropState[van]; cropState[van] = cropState[naar]; cropState[naar] = tmpCrop;
+
+  // Herlaad imgs array in juiste volgorde
+  imgs = [];
+  var pending = photos.length;
+  photos.forEach(function(p, i) {
+    var im = new Image();
+    im.onload = function() { imgs[i] = im; pending--; if(!pending) render(); };
+    im.src = p.src;
+  });
 
   // Reset invoervelden
   vanInput.value = '';
   naarInput.value = '';
-  render();
 }
 
 // ─────────────────────────────────────────────────────────
