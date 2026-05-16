@@ -547,6 +547,63 @@ function render() {
   }
 
   ctx.restore();
+
+  // Teken swap knoppen bovenop alle foto's (buiten translate/rotate context)
+  if(tbEditing && imgs.length > 1) {
+    var cells = getPhotoCells();
+    var count = Math.min(imgs.length, cells.length);
+    for(var si=0; si<count; si++) {
+      var btn = getSwapBtnPos(cells[si]);
+      var isSelected = swapIdx === si;
+      // Cirkel achtergrond
+      ctx.beginPath();
+      ctx.arc(btn.x, btn.y, btn.r, 0, Math.PI*2);
+      ctx.fillStyle = isSelected ? 'rgba(34,111,183,0.9)' : 'rgba(0,0,0,0.55)';
+      ctx.fill();
+      ctx.strokeStyle = isSelected ? '#EBD61F' : 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = isSelected ? 3 : 1.5;
+      ctx.setLineDash([]);
+      ctx.stroke();
+      // Wissel-icoon (twee pijlen)
+      var s = btn.r * 0.45;
+      ctx.strokeStyle = isSelected ? '#EBD61F' : '#fff';
+      ctx.lineWidth = btn.r * 0.12;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      // Pijl links
+      ctx.beginPath();
+      ctx.moveTo(btn.x - s*0.2, btn.y - s*0.5);
+      ctx.lineTo(btn.x - s, btn.y - s*0.5);
+      ctx.lineTo(btn.x - s, btn.y + s*0.5);
+      ctx.lineTo(btn.x - s*0.2, btn.y + s*0.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(btn.x - s*0.7, btn.y - s*0.9);
+      ctx.lineTo(btn.x - s*0.2, btn.y - s*0.5);
+      ctx.lineTo(btn.x - s*0.7, btn.y - s*0.1);
+      ctx.stroke();
+      // Pijl rechts
+      ctx.beginPath();
+      ctx.moveTo(btn.x + s*0.2, btn.y + s*0.5);
+      ctx.lineTo(btn.x + s, btn.y + s*0.5);
+      ctx.lineTo(btn.x + s, btn.y - s*0.5);
+      ctx.lineTo(btn.x + s*0.2, btn.y - s*0.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(btn.x + s*0.7, btn.y + s*0.9);
+      ctx.lineTo(btn.x + s*0.2, btn.y + s*0.5);
+      ctx.lineTo(btn.x + s*0.7, btn.y + s*0.1);
+      ctx.stroke();
+      // Label
+      if(isSelected) {
+        ctx.fillStyle = '#EBD61F';
+        ctx.font = 'bold ' + Math.round(btn.r*0.35) + 'px -apple-system,sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('Kies foto', btn.x, btn.y + btn.r + 4);
+      }
+    }
+  }
 }
 
 function hexToRgba(hex,a){
@@ -568,7 +625,9 @@ function canvasXY(e) {
 function getTBRect() { return {x:TB.x, y:TB.y, w:TB.w, h:TB.h}; }
 
 function getResizeHandle(px,py) {
-  var R=getTBRect(), m=20;
+  // Grotere touch zone op mobiel
+  var isMobile = window.innerWidth <= 768;
+  var R=getTBRect(), m=isMobile?50:20;
   var corners=[
     {name:'nw',x:R.x,y:R.y},{name:'ne',x:R.x+R.w,y:R.y},
     {name:'se',x:R.x+R.w,y:R.y+R.h},{name:'sw',x:R.x,y:R.y+R.h}
@@ -581,7 +640,10 @@ function getResizeHandle(px,py) {
 
 function hitTestTB(px,py){
   var R=getTBRect();
-  return px>=R.x&&px<=R.x+R.w&&py>=R.y&&py<=R.y+R.h;
+  // Vergroot raakzone op mobiel met 20px aan alle kanten
+  var isMobile = window.innerWidth <= 768;
+  var m = isMobile ? 20 : 0;
+  return px>=R.x-m&&px<=R.x+R.w+m&&py>=R.y-m&&py<=R.y+R.h+m;
 }
 
 function hitTestPhoto(px,py){
@@ -596,6 +658,28 @@ function hitTestPhoto(px,py){
 function onMouseDown(e) {
   if(e.button===2) return;
   var pos=canvasXY(e);
+
+  // Controleer of swap-knop is aangeklikt
+  var swapBtnIdx = hitTestSwapBtn(pos.x, pos.y);
+  if(swapBtnIdx >= 0) {
+    if(swapIdx === -1) {
+      // Eerste foto geselecteerd
+      swapIdx = swapBtnIdx;
+    } else if(swapIdx === swapBtnIdx) {
+      // Zelfde foto — deselecteer
+      swapIdx = -1;
+    } else {
+      // Tweede foto — wissel
+      swapPhotos(swapIdx, swapBtnIdx);
+      swapIdx = -1;
+    }
+    render();
+    return;
+  }
+
+  // Klik buiten swap-knop annuleert swap modus
+  if(swapIdx >= 0) { swapIdx = -1; render(); }
+
   var handle=getResizeHandle(pos.x,pos.y);
   if(handle){
     interaction={type:'tb-resize',handle:handle,startX:pos.x,startY:pos.y,startTBx:TB.x,startTBy:TB.y,startTBw:TB.w,startTBh:TB.h};
@@ -610,6 +694,32 @@ function onMouseDown(e) {
     interaction={type:'photo',idx:idx,startX:pos.x,startY:pos.y,startOx:cropState[idx].ox||0,startOy:cropState[idx].oy||0};
     return;
   }
+}
+
+// Swap knop positie per foto (rechtsbovenhoek van cel)
+function getSwapBtnPos(cell) {
+  var isMobile = window.innerWidth <= 768;
+  var size = isMobile ? 80 : 60;
+  return { x: cell.x + cell.w - size/2, y: cell.y + size/2, r: size/2 };
+}
+
+function hitTestSwapBtn(px, py) {
+  if(imgs.length <= 1) return -1; // Geen swap bij 1 foto
+  var cells = getPhotoCells();
+  var count = Math.min(imgs.length, cells.length);
+  for(var i=0; i<count; i++) {
+    var btn = getSwapBtnPos(cells[i]);
+    var dx = px - btn.x, dy = py - btn.y;
+    if(Math.sqrt(dx*dx+dy*dy) <= btn.r) return i;
+  }
+  return -1;
+}
+
+function swapPhotos(a, b) {
+  // Wissel foto's en cropState
+  var tmpPhoto = photos[a]; photos[a] = photos[b]; photos[b] = tmpPhoto;
+  var tmpImg = imgs[a]; imgs[a] = imgs[b]; imgs[b] = tmpImg;
+  var tmpCrop = cropState[a]; cropState[a] = cropState[b]; cropState[b] = tmpCrop;
 }
 
 function onMouseMove(e) {
@@ -639,6 +749,7 @@ function onMouseMove(e) {
   }
 
   var cur='default';
+  if(hitTestSwapBtn(pos.x,pos.y)>=0) cur='pointer';
   var hh=getResizeHandle(pos.x,pos.y);
   if(hh) cur=hh==='nw'||hh==='se'?'nwse-resize':'nesw-resize';
   else if(hitTestTB(pos.x,pos.y)) cur='move';
@@ -804,6 +915,7 @@ function resetApp(){
   photos=[];imgs=[];cropState=[];selectedLayout='full';selectedStyle='elegant';
   TB={x:0,y:null,w:1920,h:80,rot:0,opacity:0.88,color:'#050514',textColor:'#ffffff'};
   tbEditing=true;
+  swapIdx=-1;
   document.getElementById('in-name').value='';
   document.getElementById('in-caption').value='';
   document.getElementById('cb-name').checked=true;
