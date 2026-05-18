@@ -2,11 +2,7 @@
 // PHOTOS — Upload, thumbnails, drag & drop, wisselen
 // ─────────────────────────────────────────────────────────
 function addFiles(files) {
-  var toegevoegd = 0;
-  var geweigerd = 0;
   Array.from(files).forEach(function(f) {
-    if (photos.length + toegevoegd >= MAX_PHOTOS) { geweigerd++; return; }
-    toegevoegd++;
     var r = new FileReader();
     r.onload = function(e) {
       photos.push({name:f.name, src:e.target.result});
@@ -16,19 +12,18 @@ function addFiles(files) {
     };
     r.readAsDataURL(f);
   });
-  if (geweigerd > 0) {
-    showFotoErr('Maximum van ' + MAX_PHOTOS + ' fotos bereikt. ' + geweigerd + ' foto(s) niet toegevoegd.');
-  }
 }
 
 function checkMaxPhotos() {
   var warn = document.getElementById('foto-max-warn');
   if (!warn) return;
-  if (photos.length >= MAX_PHOTOS) {
+  if (photos.length > MAX_PHOTOS) {
+    warn.textContent = 'Je hebt ' + photos.length + ' fotos geselecteerd. Verwijder ' + (photos.length - MAX_PHOTOS) + ' foto(s) om verder te gaan (max ' + MAX_PHOTOS + ').';
     warn.style.display = 'block';
-    document.getElementById('btn2').disabled = false;
+    document.getElementById('btn2').disabled = true;
   } else {
     warn.style.display = 'none';
+    document.getElementById('btn2').disabled = photos.length === 0;
   }
 }
 
