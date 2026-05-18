@@ -23,18 +23,12 @@ function selLayout(el, key) {
 }
 
 function getLayout() {
-  return selectedLayout === 'auto' ? autoLayout() : selectedLayout;
-}
-
-function autoLayout() {
-  var n = Math.min(photos.length, MAX_PHOTOS);
-  var ori = getOrientation();
-  if(n <= 1) return 'full';
-  if(n === 2) return ori === 'portrait' ? 'duo' : 'boven-onder';
-  if(n === 3) return 'featured';
-  if(n === 4) return 'grid4';
-  if(n === 5) return 'grid23';
-  return 'grid32';
+  // Geen auto meer - gebruik geselecteerde layout, of eerste optie als fallback
+  if(selectedLayout === 'auto' || !selectedLayout) {
+    var opties = getLayoutOpties(Math.min(photos.length, MAX_PHOTOS));
+    return opties.length > 0 ? opties[0].key : 'full';
+  }
+  return selectedLayout;
 }
 
 function getPhotoCells() {
@@ -216,85 +210,86 @@ function getPhotoCells() {
   return cells;
 }
 
-// Genereer altijd 6 layout opties op basis van aantal foto's
+// Genereer altijd exact 6 layouts die het aantal foto's volledig benutten
 function getLayoutOpties(n) {
   n = Math.min(n, MAX_PHOTOS);
+  if(n === 0) return [];
 
-  // Basis opties per aantal (altijd 5 + auto = 6 totaal)
-  if(n <= 1) {
+  // Elke layout gebruikt precies n foto's
+  // Bij weinig foto's: meer speelse varianten om aan 6 te komen
+  if(n === 1) {
     return [
-      {key:'full',          label:'Fullscreen'},
-      {key:'duo',           label:'Duo'},
-      {key:'featured',      label:'Featured'},
-      {key:'grid4',         label:'Grid 2×2'},
-      {key:'strip',         label:'Strip'},
-      {key:'speels-focus',  label:'Focus', speels:true}
+      {key:'full',           label:'Fullscreen'},
+      {key:'cinematic',      label:'Cinematic'},
+      {key:'speels-overlap', label:'Zoom in',     speels:true},
+      {key:'boven-onder',    label:'Breed',        speels:true},
+      {key:'speels-cirkel',  label:'Cirkel',       speels:true},
+      {key:'speels-focus',   label:'Focus',        speels:true}
     ];
   } else if(n === 2) {
     return [
-      {key:'duo',           label:'Duo'},
-      {key:'boven-onder',   label:'Boven/Onder'},
-      {key:'featured',      label:'Featured'},
-      {key:'full',          label:'Fullscreen'},
-      {key:'speels-overlap',label:'Overlap',  speels:true},
-      {key:'speels-cirkel', label:'Cirkel',   speels:true}
+      {key:'duo',            label:'Duo'},
+      {key:'boven-onder',    label:'Boven/Onder'},
+      {key:'speels-overlap', label:'Overlap',      speels:true},
+      {key:'speels-cirkel',  label:'Cirkel duo',   speels:true},
+      {key:'featured',       label:'Featured'},
+      {key:'speels-schuin',  label:'Schuin',       speels:true}
     ];
   } else if(n === 3) {
     return [
-      {key:'featured',      label:'Featured'},
-      {key:'strip',         label:'Strip'},
-      {key:'grid4',         label:'Grid 2×2'},
-      {key:'boven-onder',   label:'Boven/Onder'},
-      {key:'speels-cirkel', label:'Cirkel',   speels:true},
-      {key:'speels-schuin', label:'Schuin',   speels:true}
+      {key:'featured',       label:'Featured'},
+      {key:'strip',          label:'Strip'},
+      {key:'speels-cirkel',  label:'Cirkel',       speels:true},
+      {key:'speels-schuin',  label:'Schuin trio',  speels:true},
+      {key:'mosaic',         label:'Mozaiek'},
+      {key:'speels-focus',   label:'Focus',        speels:true}
     ];
   } else if(n === 4) {
     return [
-      {key:'grid4',         label:'Grid 2×2'},
-      {key:'featured3',     label:'Featured+3'},
-      {key:'strip',         label:'Strip'},
-      {key:'duo',           label:'Duo'},
-      {key:'speels-schuin', label:'Schuin',   speels:true},
-      {key:'speels-focus',  label:'Focus',    speels:true}
+      {key:'grid4',          label:'Grid 2x2'},
+      {key:'featured3',      label:'Featured+3'},
+      {key:'speels-schuin',  label:'Schuin',       speels:true},
+      {key:'speels-focus',   label:'Focus',        speels:true},
+      {key:'grid23',         label:'Breed+2'},
+      {key:'speels-cirkel',  label:'Cirkel',       speels:true}
     ];
   } else if(n === 5) {
     return [
-      {key:'grid23',        label:'Grid 2+3'},
-      {key:'featured4',     label:'Featured+4'},
-      {key:'grid4',         label:'Grid 2×2'},
-      {key:'featured3',     label:'Featured+3'},
-      {key:'speels-focus',  label:'Focus',    speels:true},
-      {key:'speels-schuin', label:'Schuin',   speels:true}
+      {key:'grid23',         label:'Grid 2+3'},
+      {key:'featured4',      label:'Featured+4'},
+      {key:'speels-focus',   label:'Focus',        speels:true},
+      {key:'speels-schuin',  label:'Schuin',       speels:true},
+      {key:'grid32',         label:'Grid rij'},
+      {key:'speels-cirkel',  label:'Cirkel',       speels:true}
     ];
   } else {
     return [
-      {key:'grid32',        label:'Grid 3×2'},
-      {key:'grid23-6',      label:'Grid 2+4'},
-      {key:'grid23',        label:'Grid 2+3'},
-      {key:'featured4',     label:'Featured+4'},
-      {key:'filmstrip',     label:'Filmstrip', speels:true},
-      {key:'speels-focus',  label:'Focus',     speels:true}
+      {key:'grid32',         label:'Grid 3x2'},
+      {key:'grid23-6',       label:'Grid 2+4'},
+      {key:'filmstrip',      label:'Filmstrip',    speels:true},
+      {key:'speels-focus',   label:'Focus',        speels:true},
+      {key:'featured4',      label:'Featured+4'},
+      {key:'speels-schuin',  label:'Schuin',       speels:true}
     ];
   }
 }
 
-// Bouw layout kiezer dynamisch — altijd 7 opties (Auto + 6 voorstellen)
+// Bouw layout kiezer dynamisch — altijd exact 6 layouts passend bij aantal fotos
 function buildLayoutGrid() {
   var n = Math.min(photos.length, MAX_PHOTOS);
   var grid = document.getElementById('layout-grid');
   if(!grid) return;
   grid.innerHTML = '';
-
-  // Auto altijd als eerste
-  var autoDiv = document.createElement('div');
-  autoDiv.className = 'lo' + (selectedLayout === 'auto' ? ' sel' : '');
-  autoDiv.innerHTML = '<div class="lt" style="display:flex;align-items:center;justify-content:center;font-size:18px">✨</div><div class="ln">Auto</div>';
-  autoDiv.onclick = function(){ selLayout(autoDiv, 'auto'); };
-  grid.appendChild(autoDiv);
-
   if(n === 0) return;
 
   var opties = getLayoutOpties(n);
+
+  // Selecteer eerste optie als huidige selectie niet meer past
+  var geldigeKeys = opties.map(function(o){ return o.key; });
+  if(geldigeKeys.indexOf(selectedLayout) < 0) {
+    selectedLayout = opties[0].key;
+  }
+
   opties.forEach(function(opt) {
     var div = document.createElement('div');
     div.className = 'lo' + (selectedLayout === opt.key ? ' sel' : '');
