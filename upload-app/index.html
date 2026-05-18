@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.38</title>
+<title>VEP Foto Upload v2.39</title>
 <link rel="stylesheet" href="vep-upload-app.css">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="../shared/vep-icon.svg">
@@ -20,7 +20,7 @@
     <div class="logo"><img src="../shared/vep-icon.svg" style="width:42px;height:42px;border-radius:10px;display:block"></div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.38</span>
+    <span class="badge badge-b">v2.39</span>
   </div>
 
   <!-- STAPPEN -->
@@ -88,6 +88,9 @@
         <span style="font-size:12px;color:var(--m)">JPG, PNG, WEBP — max 6 foto's</span>
       </div>
       <input type="file" id="fi" multiple accept="image/*" onchange="addFiles(this.files)">
+      <div id="foto-max-warn" style="display:none;margin-top:8px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:var(--r);font-size:13px;color:#b91c1c">
+        Maximum van 6 foto's bereikt. Verwijder foto's om verder te gaan.
+      </div>
       <div class="photo-grid" id="pg"></div>
       <div style="display:none;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--m)" id="pinfo">
         <span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span>

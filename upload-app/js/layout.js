@@ -216,64 +216,85 @@ function getPhotoCells() {
   return cells;
 }
 
-// Genereer layout opties op basis van aantal foto's
+// Genereer altijd 6 layout opties op basis van aantal foto's
 function getLayoutOpties(n) {
   n = Math.min(n, MAX_PHOTOS);
-  var opties = [];
+
+  // Basis opties per aantal (altijd 5 + auto = 6 totaal)
   if(n <= 1) {
-    opties = [
-      {key:'full', label:'Fullscreen'}
+    return [
+      {key:'full',          label:'Fullscreen'},
+      {key:'duo',           label:'Duo'},
+      {key:'featured',      label:'Featured'},
+      {key:'grid4',         label:'Grid 2×2'},
+      {key:'strip',         label:'Strip'},
+      {key:'speels-focus',  label:'Focus', speels:true}
     ];
   } else if(n === 2) {
-    opties = [
-      {key:'duo', label:'Duo'},
-      {key:'boven-onder', label:'Boven/Onder'},
-      {key:'speels-overlap', label:'Overlap', speels:true}
+    return [
+      {key:'duo',           label:'Duo'},
+      {key:'boven-onder',   label:'Boven/Onder'},
+      {key:'featured',      label:'Featured'},
+      {key:'full',          label:'Fullscreen'},
+      {key:'speels-overlap',label:'Overlap',  speels:true},
+      {key:'speels-cirkel', label:'Cirkel',   speels:true}
     ];
   } else if(n === 3) {
-    opties = [
-      {key:'featured', label:'Featured'},
-      {key:'strip', label:'Strip'},
-      {key:'speels-cirkel', label:'Cirkel', speels:true}
+    return [
+      {key:'featured',      label:'Featured'},
+      {key:'strip',         label:'Strip'},
+      {key:'grid4',         label:'Grid 2×2'},
+      {key:'boven-onder',   label:'Boven/Onder'},
+      {key:'speels-cirkel', label:'Cirkel',   speels:true},
+      {key:'speels-schuin', label:'Schuin',   speels:true}
     ];
   } else if(n === 4) {
-    opties = [
-      {key:'grid4', label:'Grid 2×2'},
-      {key:'featured3', label:'Featured+3'},
-      {key:'speels-schuin', label:'Schuin', speels:true}
+    return [
+      {key:'grid4',         label:'Grid 2×2'},
+      {key:'featured3',     label:'Featured+3'},
+      {key:'strip',         label:'Strip'},
+      {key:'duo',           label:'Duo'},
+      {key:'speels-schuin', label:'Schuin',   speels:true},
+      {key:'speels-focus',  label:'Focus',    speels:true}
     ];
   } else if(n === 5) {
-    opties = [
-      {key:'grid23', label:'Grid 2+3'},
-      {key:'featured4', label:'Featured+4'},
-      {key:'speels-focus', label:'Focus', speels:true}
+    return [
+      {key:'grid23',        label:'Grid 2+3'},
+      {key:'featured4',     label:'Featured+4'},
+      {key:'grid4',         label:'Grid 2×2'},
+      {key:'featured3',     label:'Featured+3'},
+      {key:'speels-focus',  label:'Focus',    speels:true},
+      {key:'speels-schuin', label:'Schuin',   speels:true}
     ];
   } else {
-    opties = [
-      {key:'grid32', label:'Grid 3×2'},
-      {key:'grid23-6', label:'Grid 2+4'},
-      {key:'filmstrip', label:'Filmstrip', speels:true}
+    return [
+      {key:'grid32',        label:'Grid 3×2'},
+      {key:'grid23-6',      label:'Grid 2+4'},
+      {key:'grid23',        label:'Grid 2+3'},
+      {key:'featured4',     label:'Featured+4'},
+      {key:'filmstrip',     label:'Filmstrip', speels:true},
+      {key:'speels-focus',  label:'Focus',     speels:true}
     ];
   }
-  return opties;
 }
 
-// Bouw layout kiezer dynamisch op basis van foto's
+// Bouw layout kiezer dynamisch — altijd 7 opties (Auto + 6 voorstellen)
 function buildLayoutGrid() {
   var n = Math.min(photos.length, MAX_PHOTOS);
-  if(n === 0) return;
-  var opties = getLayoutOpties(n);
   var grid = document.getElementById('layout-grid');
   if(!grid) return;
   grid.innerHTML = '';
 
-  // Voeg auto altijd toe
+  // Auto altijd als eerste
   var autoDiv = document.createElement('div');
   autoDiv.className = 'lo' + (selectedLayout === 'auto' ? ' sel' : '');
-  autoDiv.innerHTML = '<div class="lt" style="display:flex;align-items:center;justify-content:center"><span style="font-size:18px">✨</span></div><div class="ln">Auto</div>';
+  autoDiv.innerHTML = '<div class="lt" style="display:flex;align-items:center;justify-content:center;font-size:18px">✨</div><div class="ln">Auto</div>';
   autoDiv.onclick = function(){ selLayout(autoDiv, 'auto'); };
   grid.appendChild(autoDiv);
 
+  if(n === 0) return;
+
+  var opties = getLayoutOpties(n);
   opties.forEach(function(opt) {
     var div = document.createElement('div');
     div.className = 'lo' + (selectedLayout === opt.key ? ' sel' : '');
