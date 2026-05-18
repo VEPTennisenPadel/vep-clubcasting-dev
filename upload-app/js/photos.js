@@ -3,11 +3,7 @@
 // ─────────────────────────────────────────────────────────
 function addFiles(files) {
   Array.from(files).forEach(function(f) {
-<<<<<<< Updated upstream
-    if (photos.length >= 20) return;
-=======
     if (photos.length >= MAX_PHOTOS) return;
->>>>>>> Stashed changes
     var r = new FileReader();
     r.onload = function(e) {
       photos.push({name:f.name, src:e.target.result});

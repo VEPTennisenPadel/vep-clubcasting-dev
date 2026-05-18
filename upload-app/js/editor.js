@@ -16,10 +16,7 @@ function initEditor() {
   TB.x = (CW - TB.w) / 2;
   document.getElementById('tb-w').value = TB.w;
 
-<<<<<<< Updated upstream
-=======
   buildLayoutGrid();
->>>>>>> Stashed changes
   var wisselWrap = document.getElementById('wissel-wrap');
   if(wisselWrap) wisselWrap.style.display = photos.length > 1 ? 'flex' : 'none';
 
@@ -45,14 +42,6 @@ function hexToRgba(hex,a){
 }
 
 function drawPhoto(img, crop, cell) {
-<<<<<<< Updated upstream
-  var x=cell.x,y=cell.y,w=cell.w,h=cell.h;
-  if(!img){
-    ctx.fillStyle='#1a1a3a'; ctx.fillRect(x,y,w,h);
-    ctx.fillStyle='#333366'; ctx.font='60px sans-serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('📷',x+w/2,y+h/2);
-=======
   var x=cell.x, y=cell.y, w=cell.w, h=cell.h;
   var isCircle = cell.clip === 'circle';
   if(!img){
@@ -63,7 +52,6 @@ function drawPhoto(img, crop, cell) {
     ctx.clip();
     ctx.fillStyle='#1a1a3a'; ctx.fillRect(x,y,w,h);
     ctx.restore();
->>>>>>> Stashed changes
     return;
   }
   var zoom=crop.zoom||1;
@@ -75,10 +63,6 @@ function drawPhoto(img, crop, cell) {
   oy=Math.max(minY,Math.min(maxY,oy));
   crop.ox=ox; crop.oy=oy;
   ctx.save();
-<<<<<<< Updated upstream
-  ctx.beginPath(); ctx.rect(x,y,w,h); ctx.clip();
-  ctx.drawImage(img,x+ox,y+oy,sw,sh);
-=======
   ctx.beginPath();
   if(isCircle) ctx.arc(x+w/2, y+h/2, Math.min(w,h)/2, 0, Math.PI*2);
   else ctx.rect(x,y,w,h);
@@ -88,7 +72,6 @@ function drawPhoto(img, crop, cell) {
   if(isCircle) {
     ctx.strokeStyle='white'; ctx.lineWidth=8; ctx.stroke();
   }
->>>>>>> Stashed changes
   ctx.restore();
 }
 

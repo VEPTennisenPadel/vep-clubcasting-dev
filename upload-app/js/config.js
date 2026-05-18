@@ -10,6 +10,9 @@ var CFG = {
   LIST_NAME:       'VEPEvents',
 };
 
+// ── Max foto's ──
+var MAX_PHOTOS = 6;
+
 // ── Canvas afmetingen ──
 var CW = 1920, CH = 1080;
 

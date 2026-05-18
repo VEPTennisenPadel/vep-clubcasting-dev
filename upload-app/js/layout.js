@@ -1,13 +1,6 @@
 // ─────────────────────────────────────────────────────────
-<<<<<<< Updated upstream
-// LAYOUT — Lay-out selectie en foto-cel berekening
-// ─────────────────────────────────────────────────────────
-=======
 // LAYOUT — Lay-out selectie, cel berekening, oriëntatie
 // ─────────────────────────────────────────────────────────
-
-// Max 6 foto's
-var MAX_PHOTOS = 6;
 
 // Detecteer oriëntatie van foto's
 function getOrientation() {
@@ -22,7 +15,6 @@ function getOrientation() {
   return 'mixed';
 }
 
->>>>>>> Stashed changes
 function selLayout(el, key) {
   selectedLayout = key;
   document.querySelectorAll('.lo').forEach(function(o){o.classList.remove('sel');});
@@ -35,23 +27,6 @@ function getLayout() {
 }
 
 function autoLayout() {
-<<<<<<< Updated upstream
-  var n = photos.length;
-  if(n <= 1) return 'full';
-  if(n === 2) return 'duo';
-  if(n === 3) return 'featured';
-  return 'grid4';
-}
-
-function getPhotoCells() {
-  var L = getLayout(), h = CH;
-  var cells = [];
-  if(L === 'full') {
-    cells = [{x:0, y:0, w:CW, h:CH}];
-  } else if(L === 'duo') {
-    cells = [{x:0, y:0, w:CW/2-2, h:h}, {x:CW/2+2, y:0, w:CW/2-2, h:h}];
-  } else if(L === 'featured') {
-=======
   var n = Math.min(photos.length, MAX_PHOTOS);
   var ori = getOrientation();
   if(n <= 1) return 'full';
@@ -87,34 +62,21 @@ function getPhotoCells() {
 
   } else if(L === 'featured') {
     // 1 groot links + 2 klein rechts
->>>>>>> Stashed changes
     var mw = CW*0.62;
     cells = [
       {x:0, y:0, w:mw-2, h:h},
       {x:mw+2, y:0, w:CW-mw-2, h:h/2-2},
       {x:mw+2, y:h/2+2, w:CW-mw-2, h:h/2-2}
     ];
-<<<<<<< Updated upstream
-  } else if(L === 'grid4') {
-    var hw = CW/2, hh = h/2;
-    cells = [
-      {x:0, y:0, w:hw-2, h:hh-2}, {x:hw+2, y:0, w:hw-2, h:hh-2},
-      {x:0, y:hh+2, w:hw-2, h:hh-2}, {x:hw+2, y:hh+2, w:hw-2, h:hh-2}
-    ];
-  } else if(L === 'strip') {
-=======
 
   } else if(L === 'strip') {
     // 3 naast elkaar
->>>>>>> Stashed changes
     var tw = CW/3;
     cells = [
       {x:0, y:0, w:tw-2, h:h},
       {x:tw+2, y:0, w:tw-2, h:h},
       {x:tw*2+4, y:0, w:tw-4, h:h}
     ];
-<<<<<<< Updated upstream
-=======
 
   } else if(L === 'grid4') {
     // 4 in 2x2
@@ -239,7 +201,6 @@ function getPhotoCells() {
       {x:tw*2+gap, y:rh+gap/2, w:tw-gap, h:rh-gap}
     ];
 
->>>>>>> Stashed changes
   } else if(L === 'mosaic') {
     var th = h*0.55, bh = h-th-4;
     cells = [
@@ -247,13 +208,6 @@ function getPhotoCells() {
       {x:0, y:th+4, w:CW/2-2, h:bh},
       {x:CW/2+2, y:th+4, w:CW/2-2, h:bh}
     ];
-<<<<<<< Updated upstream
-  } else if(L === 'cinematic') {
-    cells = [{x:0, y:0, w:CW, h:CH}];
-  }
-  return cells;
-}
-=======
 
   } else if(L === 'cinematic') {
     cells = [{x:0, y:0, w:CW, h:CH}];
@@ -374,4 +328,3 @@ function getLayoutPreviewHTML(key) {
   }
   return '<svg viewBox="0 0 100 56" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="56" fill="'+s.bg+'"/>' + rects + '</svg>';
 }
->>>>>>> Stashed changes
