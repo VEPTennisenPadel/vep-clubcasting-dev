@@ -17,7 +17,7 @@ function addFiles(files) {
     r.readAsDataURL(f);
   });
   if (geweigerd > 0) {
-    showFotoErr('Maximum van ' + MAX_PHOTOS + ' foto's bereikt. ' + geweigerd + ' foto' + (geweigerd > 1 ? ''s' : '') + ' niet toegevoegd.');
+    showFotoErr('Maximum van ' + MAX_PHOTOS + ' fotos bereikt. ' + geweigerd + ' foto(s) niet toegevoegd.');
   }
 }
 
