@@ -84,5 +84,9 @@ function resetApp(){
   document.querySelectorAll('.lo').forEach(function(o,i){o.classList.toggle('sel',i===0);});
   document.querySelectorAll('.sc').forEach(function(c,i){c.classList.toggle('sel',i===0);});
   loadUserName();
+<<<<<<< Updated upstream
+=======
+  document.getElementById('layout-grid').innerHTML = '';
+>>>>>>> Stashed changes
   goStep(1);
 }
