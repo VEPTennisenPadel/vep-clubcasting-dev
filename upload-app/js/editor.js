@@ -1,6 +1,8 @@
 // ─────────────────────────────────────────────────────────
 // EDITOR — Canvas setup, render, titelbalk, framenummers
 // ─────────────────────────────────────────────────────────
+var exporting = false;
+
 function initEditor() {
   canvas = document.getElementById('C');
   ctx = canvas.getContext('2d');
@@ -159,8 +161,8 @@ function render() {
   }
   ctx.restore();
 
-  // Framenummers
-  if(photos.length > 1) {
+  // Framenummers (alleen in editor, niet in de geëxporteerde slide)
+  if(photos.length > 1 && !exporting) {
     var fcells=getPhotoCells();
     var count=Math.min(photos.length,fcells.length);
     for(var fi=0;fi<count;fi++){

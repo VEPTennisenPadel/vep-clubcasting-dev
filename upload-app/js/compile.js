@@ -33,7 +33,11 @@ function startCompile(){
 
 function sendSlide(){
   var c=document.getElementById('C');
+  exporting=true;
+  if(typeof render==='function') render();   // canvas hertekenen zonder framenummers
   var img=c?c.toDataURL('image/jpeg',0.92):null;
+  exporting=false;
+  if(typeof render==='function') render();    // editor-weergave herstellen
   if(!img){showErr('Canvas niet beschikbaar.');return;}
   var nameInBar=document.getElementById('cb-name')?document.getElementById('cb-name').checked:true;
   fetch(CFG.APPS_SCRIPT_URL,{
