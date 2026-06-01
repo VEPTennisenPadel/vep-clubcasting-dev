@@ -1,6 +1,6 @@
 # Functioneel Ontwerp — VEP Clubcasting Foto App
 **VEP Tennis & Padel**
-Versie 2.1 | Mei 2026
+Versie 2.2 | Juni 2026
  
 ---
  
@@ -197,6 +197,8 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
 - 8 layouts beschikbaar: Fullscreen, Duo, Featured, Grid, Strip, Mozaïek, Cinematic, Auto
 - Auto kiest op basis van aantal foto's
 - Wijziging direct zichtbaar in canvas
+- Bij meerdere foto's tonen genummerde markeringen (framenummers) per fotovak in de editor, zodat het lid ziet welke foto in welk vak komt
+- Framenummers zijn uitsluitend een hulpmiddel in de editor en verschijnen niet in de verstuurde slide (zie US-501)
 #### US-402 · Foto uitsnede aanpassen
 **Als** VEP lid  
 **Wil ik** de uitsnede van een foto kunnen aanpassen  
@@ -238,6 +240,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 **Acceptatiecriteria:**
 - Canvas gerenderd als JPEG (kwaliteit instelbaar via beheer-app)
+- De framenummers uit de editor worden niet meegerenderd in de verstuurde JPEG: vlak vóór de export wordt het canvas eenmalig hertekend zonder framenummers, de JPEG wordt vastgelegd, en daarna wordt de editor-weergave (mét framenummers) hersteld
 - Verzonden naar Google Apps Script via POST
 - Voortgangsindicator toont 4 stappen
 - Succes bevestigd met samenvatting
@@ -287,7 +290,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 | Component | Versie | Locatie |
 |---|---|---|
-| Upload-app | v2.15 | `upload-app/index.html` |
+| Upload-app | v2.42 | `upload-app/index.html` |
 | Beheer-app | — | `beheer-app/index.html` |
 | Apps Script | — | Google Apps Script "VEP Foto Compilatie" |
  

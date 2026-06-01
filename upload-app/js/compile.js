@@ -33,11 +33,21 @@ function startCompile(){
 
 function sendSlide(){
   var c=document.getElementById('C');
-  exporting=true;
-  if(typeof render==='function') render();   // canvas hertekenen zonder framenummers
-  var img=c?c.toDataURL('image/jpeg',0.92):null;
-  exporting=false;
-  if(typeof render==='function') render();    // editor-weergave herstellen
+  var img=null;
+  if(c){
+    // Framenummers zijn alleen een hulpmiddel in de editor en mogen niet
+    // mee in de verstuurde slide. We zetten de export-vlag aan, tekenen het
+    // canvas synchroon opnieuw zonder nummers, leggen de JPEG vast en
+    // herstellen daarna de editor-weergave (mét nummers).
+    exporting=true;
+    try {
+      if(typeof render==='function') render();   // hertekenen zonder framenummers
+      img=c.toDataURL('image/jpeg',0.92);
+    } finally {
+      exporting=false;
+      if(typeof render==='function') render();    // editor-weergave herstellen
+    }
+  }
   if(!img){showErr('Canvas niet beschikbaar.');return;}
   var nameInBar=document.getElementById('cb-name')?document.getElementById('cb-name').checked:true;
   fetch(CFG.APPS_SCRIPT_URL,{
