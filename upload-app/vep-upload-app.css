@@ -83,6 +83,10 @@ input[type=color]{width:36px;height:28px;padding:2px;border:1px solid #d1d5db;bo
 .editor-wrap canvas{display:block;width:100%;height:100%}
 .editor-hint{font-size:11px;color:var(--m);margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
 .editor-hint span{display:flex;align-items:center;gap:4px}
+.editor-tabs{display:flex;gap:6px;margin-bottom:8px}
+.editor-tab{flex:1;padding:9px 12px;border:1px solid #d1d5db;border-radius:var(--r);background:var(--w);color:var(--m);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s}
+.editor-tab:hover{border-color:var(--green)}
+.editor-tab.sel{background:var(--gl);border-color:var(--green);color:var(--gd);font-weight:600}
 
 /* ── TITELBALK CONTROLS ── */
 .tb-panel{background:var(--bg);border:1px solid #e5e7eb;border-radius:var(--r);padding:.875rem;margin-top:.875rem}

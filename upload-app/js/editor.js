@@ -7,8 +7,8 @@ function initEditor() {
   canvas = document.getElementById('C');
   ctx = canvas.getContext('2d');
   canvas.width = CW; canvas.height = CH;
-  tbEditing = true;
-  tbSelected = false;
+  tbMoved = false;
+  editorMode = 'photos';
 
   TB.opacity = 0.88;
   document.getElementById('tb-op').value = 88;
@@ -92,8 +92,15 @@ function render() {
   TB.opacity=top/100; TB.rot=trot*Math.PI/180;
   TB.color=document.getElementById('tb-color').value;
   TB.textColor=document.getElementById('tb-textcolor').value;
-  if(TB.y===null || TB.y > CH || TB.y < -TB.h) TB.y = CH - TB.h;
-  if(TB.x===null || TB.x > CW) TB.x = Math.round((CW - TB.w) / 2);
+  // Auto-centreren zolang de gebruiker de balk nog niet zelf heeft verplaatst.
+  // Daarna blijft de gekozen positie staan (alleen terugzetten als hij volledig buiten beeld is).
+  if(!tbMoved){
+    if(TB.y===null || TB.y > CH || TB.y < -TB.h) TB.y = CH - TB.h;
+    if(TB.x===null || TB.x > CW) TB.x = Math.round((CW - TB.w) / 2);
+  } else {
+    if(TB.y===null) TB.y = CH - TB.h;
+    if(TB.x===null) TB.x = Math.round((CW - TB.w) / 2);
+  }
 
   ctx.clearRect(0,0,CW,CH);
   ctx.fillStyle='#0A0A14'; ctx.fillRect(0,0,CW,CH);
@@ -179,6 +186,33 @@ function render() {
     }
     ctx.shadowBlur=0;
   }
+
+  // Titelbalk-grepen (alleen in titelbalk-modus, niet in export)
+  if(editorMode==='titlebar' && !exporting){
+    ctx.save();
+    ctx.translate(TB.x+TB.w/2, TB.y+TB.h/2);
+    ctx.rotate(TB.rot);
+    // omtreklijn
+    ctx.strokeStyle='#226FB7'; ctx.lineWidth=3;
+    ctx.setLineDash([12,8]);
+    ctx.strokeRect(-TB.w/2,-TB.h/2,TB.w,TB.h);
+    ctx.setLineDash([]);
+    // hoekgrepen
+    var hs=TBH.size;
+    var corners=[[-TB.w/2,-TB.h/2],[TB.w/2,-TB.h/2],[TB.w/2,TB.h/2],[-TB.w/2,TB.h/2]];
+    corners.forEach(function(c){
+      ctx.fillStyle='#ffffff'; ctx.strokeStyle='#226FB7'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.rect(c[0]-hs/2,c[1]-hs/2,hs,hs);
+      ctx.fill(); ctx.stroke();
+    });
+    // rotatiegreep (boven het midden)
+    var rotY=-TB.h/2-TBH.rotDist;
+    ctx.strokeStyle='#226FB7'; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(0,-TB.h/2); ctx.lineTo(0,rotY); ctx.stroke();
+    ctx.fillStyle='#EBD61F'; ctx.strokeStyle='#226FB7';
+    ctx.beginPath(); ctx.arc(0,rotY,TBH.size/2,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
 }
 
 // Kleur functies
@@ -204,4 +238,63 @@ function setTextColor(el){
 function setTextColorCustom(v){
   document.querySelectorAll('#text-swatches .swatch').forEach(function(s){s.classList.remove('sel');});
   TB.textColor=v; render();
+}
+
+// ─────────────────────────────────────────────────────────
+// TITELBALK-MODUS — tab-switch, grepen, synchronisatie
+// ─────────────────────────────────────────────────────────
+var TBH = { size: 28, rotDist: 50, hitPad: 18 };  // greep-afmetingen in canvas-px
+
+function setEditorMode(mode, el){
+  editorMode = mode;
+  document.querySelectorAll('.editor-tab').forEach(function(t){t.classList.remove('sel');});
+  if(el) el.classList.add('sel');
+  // hints/blokken die alleen bij foto-modus horen tonen/verbergen
+  document.querySelectorAll('[data-mode="photos"]').forEach(function(n){
+    n.style.display = (mode==='photos') ? '' : 'none';
+  });
+  document.querySelectorAll('[data-mode="titlebar"]').forEach(function(n){
+    n.style.display = (mode==='titlebar') ? '' : 'none';
+  });
+  // wissel-blok hangt af van fotoaantal, niet alleen van de modus
+  var ww=document.getElementById('wissel-wrap');
+  if(ww) ww.style.display = (mode==='photos' && photos.length>1) ? 'flex' : 'none';
+  // titelbalk-modus = los van auto-centrering zodra je hem aanraakt; tonen kan al
+  if(canvas){ canvas.style.cursor = (mode==='titlebar') ? 'move' : 'default'; }
+  render();
+}
+
+// Roteer een punt (px,py) terug naar het lokale, niet-geroteerde titelbalk-assenstelsel.
+// Geeft coördinaten t.o.v. het midden van de titelbalk.
+function tbLocalPoint(px,py){
+  var cx=TB.x+TB.w/2, cy=TB.y+TB.h/2;
+  var dx=px-cx, dy=py-cy;
+  var cos=Math.cos(-TB.rot), sin=Math.sin(-TB.rot);
+  return { lx: dx*cos - dy*sin, ly: dx*sin + dy*cos };
+}
+
+// Bepaal welk onderdeel van de titelbalk geraakt wordt: 'rotate', hoek 'nw/ne/se/sw',
+// 'move' (binnen de balk), of null (mis).
+function tbHitTest(px,py){
+  var p=tbLocalPoint(px,py);
+  var hw=TB.w/2, hh=TB.h/2, pad=TBH.hitPad;
+  // rotatiegreep
+  var rotLy=-hh-TBH.rotDist;
+  if(Math.abs(p.lx)<=TBH.size/2+pad && Math.abs(p.ly-rotLy)<=TBH.size/2+pad) return 'rotate';
+  // hoeken
+  var corners={nw:[-hw,-hh],ne:[hw,-hh],se:[hw,hh],sw:[-hw,hh]};
+  for(var k in corners){
+    if(Math.abs(p.lx-corners[k][0])<=TBH.size/2+pad &&
+       Math.abs(p.ly-corners[k][1])<=TBH.size/2+pad) return k;
+  }
+  // binnen de balk
+  if(p.lx>=-hw && p.lx<=hw && p.ly>=-hh && p.ly<=hh) return 'move';
+  return null;
+}
+
+// Schrijf TB-waarden terug naar de invoervelden zodat slepen en typen synchroon blijven.
+function syncTBFields(){
+  var w=document.getElementById('tb-w'); if(w) w.value=Math.round(TB.w);
+  var h=document.getElementById('tb-h'); if(h) h.value=Math.round(TB.h);
+  var r=document.getElementById('tb-rot'); if(r) r.value=Math.round(TB.rot*180/Math.PI);
 }

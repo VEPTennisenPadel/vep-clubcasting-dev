@@ -28,8 +28,8 @@ var selectedStyle  = 'elegant';
 
 // ── Titelbalk state ──
 var TB = { x:0, y:null, w:Math.round(1920*0.5), h:160, rot:0, opacity:0.88, color:'#050514', textColor:'#ffffff' };
-var tbEditing  = true;
-var tbSelected = false;
+var tbMoved    = false;          // true zodra gebruiker titelbalk zelf heeft versleept/geschaald
+var editorMode = 'photos';       // 'photos' | 'titlebar' — bepaalt canvas-interactie
 
 // ── Upload instellingen ──
 var uploadSettings = { width: 1920, height: 1080, quality: 0.92 };

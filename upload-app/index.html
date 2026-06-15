@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.42</title>
+<title>VEP Foto Upload v2.43</title>
 <link rel="stylesheet" href="vep-upload-app.css">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="../shared/vep-icon.svg">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="VEP Foto">
 <meta name="theme-color" content="#226FB7">
 </head>
-<body><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div>
+<body><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div>
 <div class="container">
 
   <!-- HEADER -->
@@ -20,7 +20,7 @@
     <div class="logo"><img src="../shared/vep-icon.svg" style="width:42px;height:42px;border-radius:10px;display:block"></div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.42</span>
+    <span class="badge badge-b">v2.43</span>
   </div>
 
   <!-- STAPPEN -->
@@ -110,16 +110,19 @@
       <div class="help-panel" id="help3">
         <h4>ℹ️ Slide editor <button class="help-close" onclick="toggleHelp('help3')">✕</button></h4>
         <p><strong>Layout</strong> — kies hoe je foto's worden ingedeeld. <em>Auto</em> kiest automatisch op basis van het aantal foto's.</p>
-        <p><strong>Foto aanpassen:</strong></p>
+        <p><strong>De editor heeft twee tabbladen:</strong></p>
+        <p><strong>📷 Foto's</strong> — pas de foto's aan:</p>
         <ul>
           <li>Sleep op een foto om de uitsnede te verschuiven</li>
           <li>Ctrl + scroll om in/uit te zoomen</li>
           <li>Pinch op mobiel om te zoomen</li>
         </ul>
-        <p><strong>Titelbalk:</strong></p>
+        <p><strong>🏷️ Titelbalk</strong> — plaats en vorm de titelbalk:</p>
         <ul>
           <li>Sleep de titelbalk om hem te verplaatsen</li>
-          <li>Sleep een hoek om te resizen</li>
+          <li>Sleep een hoek om de grootte aan te passen</li>
+          <li>Sleep de bovenste greep om de balk te draaien</li>
+          <li>Of gebruik de velden onder de editor voor exacte waarden</li>
           <li>Pas kleur, transparantie en stijl aan via de instellingen</li>
           <li>Vink <em>Naam tonen in titelbalk</em> uit als je naam niet zichtbaar hoeft te zijn</li>
         </ul>
@@ -140,16 +143,25 @@
       </div>
       <div class="field">
         <label>Slide editor</label>
+        <div class="editor-tabs" role="tablist">
+          <button type="button" class="editor-tab sel" data-tab="photos" onclick="setEditorMode('photos',this)">📷 Foto's</button>
+          <button type="button" class="editor-tab" data-tab="titlebar" onclick="setEditorMode('titlebar',this)">🏷️ Titelbalk</button>
+        </div>
         <div class="editor-wrap" id="editor-wrap">
           <canvas id="C"></canvas>
           <button class="fs-btn" id="fs-btn" onclick="toggleFullscreen()" title="Volledig scherm">⛶</button>
         </div>
-        <div class="editor-hint">
+        <div class="editor-hint" data-mode="photos">
           <span>🖱️ Sleep op foto = verschuif uitsnede</span>
           <span>⌨️ Ctrl + scroll = zoom foto</span>
           <span>👌 Pinch = zoom op mobiel</span>
         </div>
-        <div id="wissel-wrap" style="display:none;margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="editor-hint" data-mode="titlebar" style="display:none">
+          <span>🖱️ Sleep de titelbalk = verplaatsen</span>
+          <span>⤡ Sleep een hoek = grootte</span>
+          <span>↻ Sleep de bovenste greep = draaien</span>
+        </div>
+        <div id="wissel-wrap" data-mode="photos" style="display:none;margin-top:10px;align-items:center;gap:8px;flex-wrap:wrap">
           <span style="font-size:13px;color:var(--m)">Foto</span>
           <input type="number" id="wissel-van" min="1" max="20" placeholder="nr" style="width:56px;padding:6px 8px;font-size:14px;border:1px solid #d1d5db;border-radius:var(--r);text-align:center">
           <span style="font-size:13px;color:var(--m)">↔ naar frame</span>

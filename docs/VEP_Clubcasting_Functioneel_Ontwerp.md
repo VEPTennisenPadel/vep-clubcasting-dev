@@ -1,6 +1,6 @@
 # Functioneel Ontwerp — VEP Clubcasting Foto App
 **VEP Tennis & Padel**
-Versie 2.2 | Juni 2026
+Versie 2.3 | Juni 2026
  
 ---
  
@@ -92,13 +92,17 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
 - Foto's direct als thumbnail weergegeven met verwijderknop
 ### Stap 3 — Editor
 - **Layout kiezer**: Fullscreen, Duo, Featured, Grid, Strip, Mozaïek, Cinematic, Auto
-- **Canvas editor** (1920×864px of afmetingen uit Google Slides):
-  - Sleep op foto = uitsnede verschuiven
-  - Ctrl + scroll = inzoomen op foto
-  - Sleep titelbalk = verplaatsen
-  - Sleep hoeken titelbalk = resizen
+- **Canvas editor** (1920×864px of afmetingen uit Google Slides) met twee tabbladen die de canvas-interactie scheiden:
+  - **Tab 📷 Foto's**:
+    - Sleep op foto = uitsnede verschuiven
+    - Ctrl + scroll (of pinch op mobiel) = inzoomen op foto
+  - **Tab 🏷️ Titelbalk**:
+    - Sleep de titelbalk = verplaatsen
+    - Sleep een hoekgreep = grootte aanpassen (tegenoverliggende hoek blijft vast)
+    - Sleep de rotatiegreep boven de balk = draaien
+    - In deze modus tonen een gestreepte omtrek en grepen rond de titelbalk; foto-interactie is uitgeschakeld
 - **Titelbalk instellingen**:
-  - Breedte, hoogte, transparantie, rotatie
+  - Breedte, hoogte, transparantie, rotatie (velden blijven synchroon met slepen/schalen op canvas)
   - Achtergrondkleur (VEP kleurenpalet + aangepast)
   - Tekstkleur (VEP kleurenpalet + aangepast)
   - Stijl: Elegant, Bold, Minimaal, Speels
@@ -218,7 +222,9 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
 - VEP kleurenpalet beschikbaar voor achtergrond en tekst
 - Aangepaste kleur via color picker
 - 4 tekststijlen: Elegant, Bold, Minimaal, Speels
-- Titelbalk versleepbaar en resizeable via hoekhandvatten
+- Titelbalk wordt aangepast via de tab 🏷️ Titelbalk; in die modus is foto-interactie uitgeschakeld, zodat slepen van de titelbalk en het verschuiven/uitsnijden van foto's elkaar niet in de weg zitten
+- Titelbalk versleepbaar, schaalbaar via hoekgrepen en draaibaar via een rotatiegreep
+- Slepen/schalen op canvas en de invoervelden (breedte/hoogte/rotatie) blijven synchroon
 #### US-404 · Naam in titelbalk
 **Als** VEP lid  
 **Wil ik** kunnen kiezen of mijn naam in de titelbalk staat  
@@ -290,7 +296,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 | Component | Versie | Locatie |
 |---|---|---|
-| Upload-app | v2.42 | `upload-app/index.html` |
+| Upload-app | v2.43 | `upload-app/index.html` |
 | Beheer-app | — | `beheer-app/index.html` |
 | Apps Script | — | Google Apps Script "VEP Foto Compilatie" |
  
