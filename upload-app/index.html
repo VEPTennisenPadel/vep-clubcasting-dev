@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VEP Foto Upload v2.43</title>
+<title>VEP Foto Upload v2.44</title>
 <link rel="stylesheet" href="vep-upload-app.css">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="../shared/vep-icon.svg">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="VEP Foto">
 <meta name="theme-color" content="#226FB7">
 </head>
-<body><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div>
+<body><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div><div style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;text-align:center;padding:6px;font-weight:700;font-size:13px">TESTOMGEVING</div><div style="height:32px"></div>
 <div class="container">
 
   <!-- HEADER -->
@@ -20,7 +20,7 @@
     <div class="logo"><img src="../shared/vep-icon.svg" style="width:42px;height:42px;border-radius:10px;display:block"></div>
     <div><h1>VEP Foto Compilatie</h1><p>Tennis &amp; Padel — Clubcasting</p></div>
     <span class="badge badge-g" style="margin-left:auto" id="user-badge">VEP Lid</span>
-    <span class="badge badge-b">v2.43</span>
+    <span class="badge badge-b">v2.44</span>
   </div>
 
   <!-- STAPPEN -->
@@ -39,17 +39,7 @@
       <button class="help-btn" onclick="toggleHelp('help1')" title="Help">?</button>
       <div class="help-panel" id="help1">
         <h4>ℹ️ Info invullen <button class="help-close" onclick="toggleHelp('help1')">✕</button></h4>
-        <p><strong>Jouw naam</strong> wordt automatisch ingevuld vanuit je VEP Microsoft account en is niet aanpasbaar.</p>
         <p><strong>Event</strong> — kies het event waarbij je foto's hebt gemaakt. Staat jouw event er niet tussen? Klik op <em>✏️ Ander event</em> en typ de naam zelf in.</p>
-        <p><strong>Bijschrift</strong> is optioneel en verschijnt achter de eventnaam in de titelbalk, bijv. <em>"Geweldige sfeer!"</em></p>
-      </div>
-      <div class="field">
-        <label>Jouw naam</label>
-        <input type="text" id="in-name" placeholder="Wordt automatisch ingevuld..." autocomplete="off" readonly style="background:var(--bg);color:var(--m);cursor:default">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
-          <input type="checkbox" id="cb-name" checked onchange="render()" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0">
-          <label for="cb-name" style="font-size:12px;color:var(--m);font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer;margin:0">Naam tonen in titelbalk</label>
-        </div>
       </div>
       <div class="field">
         <label>Event <span style="font-size:10px;color:var(--green);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0" onclick="loadEvents()">↻</span></label>
@@ -57,10 +47,6 @@
       </div>
       <div id="custom-event-wrap" style="display:none;margin-top:8px">
         <input type="text" id="in-custom-event" placeholder="Typ hier je eventnaam..." style="width:100%" oninput="selectedEvent=this.value.trim()">
-      </div>
-      <div class="field">
-        <label>Bijschrift <span style="font-weight:400;text-transform:none;letter-spacing:0">(optioneel)</span></label>
-        <input type="text" id="in-caption" placeholder="bv. Geweldige sfeer!">
       </div>
     </div>
     <div class="btn-row">
@@ -124,7 +110,8 @@
           <li>Sleep de bovenste greep om de balk te draaien</li>
           <li>Of gebruik de velden onder de editor voor exacte waarden</li>
           <li>Pas kleur, transparantie en stijl aan via de instellingen</li>
-          <li>Vink <em>Naam tonen in titelbalk</em> uit als je naam niet zichtbaar hoeft te zijn</li>
+          <li><em>Jouw naam</em> wordt automatisch ingevuld vanuit je VEP Microsoft account; vink <em>Naam tonen in titelbalk</em> uit als je naam niet zichtbaar hoeft te zijn</li>
+          <li><em>Bijschrift</em> is optioneel en verschijnt achter de eventnaam in de titelbalk, bijv. <em>"Geweldige sfeer!"</em></li>
         </ul>
         <p><strong>Volledig scherm:</strong></p>
         <ul>
@@ -169,8 +156,20 @@
           <button class="btn-p" onclick="wisselFoto()" style="flex:none;padding:7px 14px;font-size:13px">↔ Wissel</button>
         </div>
       </div>
-      <div class="tb-panel">
+      <div class="tb-panel" data-mode="titlebar" style="display:none">
         <h4>Titelbalk instellingen</h4>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>Jouw naam</label>
+          <input type="text" id="in-name" placeholder="Wordt automatisch ingevuld..." autocomplete="off" readonly style="background:var(--bg);color:var(--m);cursor:default">
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+            <input type="checkbox" id="cb-name" checked onchange="render()" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0">
+            <label for="cb-name" style="font-size:12px;color:var(--m);font-weight:400;text-transform:none;letter-spacing:0;cursor:pointer;margin:0">Naam tonen in titelbalk</label>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>Bijschrift <span style="font-weight:400;text-transform:none;letter-spacing:0">(optioneel)</span></label>
+          <input type="text" id="in-caption" placeholder="bv. Geweldige sfeer!" oninput="render()">
+        </div>
         <div class="tb-grid">
           <div class="tb-field"><label>Breedte (px)</label><input type="number" id="tb-w" value="960" min="200" max="1920" oninput="render()"></div>
           <div class="tb-field"><label>Hoogte (px)</label><input type="number" id="tb-h" value="160" min="30" max="300" oninput="render()"></div>

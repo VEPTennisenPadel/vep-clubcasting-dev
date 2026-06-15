@@ -1,6 +1,6 @@
 # Functioneel Ontwerp — VEP Clubcasting Foto App
 **VEP Tennis & Padel**
-Versie 2.3 | Juni 2026
+Versie 2.4 | Juni 2026
  
 ---
  
@@ -80,12 +80,9 @@ vep-clubcasting/
 De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en een slide kunnen samenstellen voor de clubcasting.
  
 ### Stap 1 — Info
-- **Naam**: automatisch ingevuld vanuit het Microsoft account (niet aanpasbaar)
-  - Haakjes worden verwijderd, bijv. "Hans de Rooij (TV VEP)" → "Hans de Rooij"
 - **Event**: keuzelijst met events uit SharePoint (`VEPEvents` lijst)
   - Events gesorteerd op datum
   - Optie **✏️ Ander event**: vrij tekstveld voor eigen eventnaam (niet opgenomen in SharePoint lijst)
-- **Bijschrift**: optioneel vrij tekstveld
 ### Stap 2 — Foto's
 - Klik of sleep foto's (JPG, PNG, WEBP)
 - Maximaal 20 foto's per upload
@@ -101,14 +98,15 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
     - Sleep een hoekgreep = grootte aanpassen (tegenoverliggende hoek blijft vast)
     - Sleep de rotatiegreep boven de balk = draaien
     - In deze modus tonen een gestreepte omtrek en grepen rond de titelbalk; foto-interactie is uitgeschakeld
-- **Titelbalk instellingen**:
+- **Titelbalk instellingen** (zichtbaar onder de tab 🏷️ Titelbalk, niet onder Foto's):
+  - **Jouw naam**: automatisch ingevuld vanuit het Microsoft account (niet aanpasbaar); haakjes worden verwijderd, bijv. "Hans de Rooij (TV VEP)" → "Hans de Rooij"
+  - **Naam tonen in titelbalk**: checkbox (standaard aangevinkt) om naam wel/niet te tonen
+  - **Bijschrift**: optioneel vrij tekstveld; verschijnt achter de eventnaam in de titelbalk
   - Breedte, hoogte, transparantie, rotatie (velden blijven synchroon met slepen/schalen op canvas)
   - Achtergrondkleur (VEP kleurenpalet + aangepast)
   - Tekstkleur (VEP kleurenpalet + aangepast)
   - Stijl: Elegant, Bold, Minimaal, Speels
-- **Naam in titelbalk**: checkbox om naam wel/niet te tonen in de titelbalk
-  - Naam staat altijd rechtsonder in de titelbalk, los van de eventtekst
-  - Eventtekst gebruikt volledige breedte en mag wrappen
+  - Naam staat altijd rechtsonder in de titelbalk, los van de eventtekst; eventtekst gebruikt volledige breedte en mag wrappen
 ### Stap 4 — Verzenden
 - Canvas gerenderd als JPEG en verzonden naar Google Apps Script
 - Voortgangsindicator met 4 stappen
@@ -139,8 +137,9 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 **Acceptatiecriteria:**
 - Naam zichtbaar in header badge
-- Naam automatisch ingevuld in naamveld stap 1
+- Naam automatisch ingevuld in naamveld (onder de tab 🏷️ Titelbalk in stap 3)
 - Fallback via Microsoft Graph API als naam niet in token zit
+- Naam wordt als vangnet gevalideerd bij de overgang naar stap 4 (verzenden)
 ---
  
 ### Epic 2 — Event selectie
@@ -231,7 +230,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
 **Zodat** ik zelf bepaal of ik zichtbaar ben
  
 **Acceptatiecriteria:**
-- Checkbox "Naam tonen in titelbalk" standaard aangevinkt
+- Checkbox "Naam tonen in titelbalk" staat onder de tab 🏷️ Titelbalk in stap 3, standaard aangevinkt
 - Naam staat rechtsonder in de titelbalk
 - Eventtekst gebruikt volledige breedte, naam en eventtekst overlappen nooit
 - Wijziging direct zichtbaar in canvas
@@ -296,7 +295,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 | Component | Versie | Locatie |
 |---|---|---|
-| Upload-app | v2.43 | `upload-app/index.html` |
+| Upload-app | v2.44 | `upload-app/index.html` |
 | Beheer-app | — | `beheer-app/index.html` |
 | Apps Script | — | Google Apps Script "VEP Foto Compilatie" |
  

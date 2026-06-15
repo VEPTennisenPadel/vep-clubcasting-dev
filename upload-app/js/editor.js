@@ -8,7 +8,6 @@ function initEditor() {
   ctx = canvas.getContext('2d');
   canvas.width = CW; canvas.height = CH;
   tbMoved = false;
-  editorMode = 'photos';
 
   TB.opacity = 0.88;
   document.getElementById('tb-op').value = 88;
@@ -21,6 +20,8 @@ function initEditor() {
   buildLayoutGrid();
   var wisselWrap = document.getElementById('wissel-wrap');
   if(wisselWrap) wisselWrap.style.display = photos.length > 1 ? 'flex' : 'none';
+
+  setEditorMode('photos');   // start in fotomodus; toont/verbergt de juiste panelen
 
   imgs = [];
   var pending = photos.length;
@@ -249,6 +250,7 @@ function setEditorMode(mode, el){
   editorMode = mode;
   document.querySelectorAll('.editor-tab').forEach(function(t){t.classList.remove('sel');});
   if(el) el.classList.add('sel');
+  else { var tab=document.querySelector('.editor-tab[data-tab="'+mode+'"]'); if(tab) tab.classList.add('sel'); }
   // hints/blokken die alleen bij foto-modus horen tonen/verbergen
   document.querySelectorAll('[data-mode="photos"]').forEach(function(n){
     n.style.display = (mode==='photos') ? '' : 'none';
