@@ -1,6 +1,6 @@
 # Functioneel Ontwerp — VEP Clubcasting Foto App
 **VEP Tennis & Padel**
-Versie 2.4 | Juni 2026
+Versie 2.5 | Juni 2026
  
 ---
  
@@ -82,7 +82,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
 ### Stap 1 — Info
 - **Event**: keuzelijst met events uit SharePoint (`VEPEvents` lijst)
   - Events gesorteerd op datum
-  - Optie **✏️ Ander event**: vrij tekstveld voor eigen eventnaam (niet opgenomen in SharePoint lijst)
+  - Optie **✏️ Ander event**: vrij tekstveld voor eigen eventnaam (wordt opgeslagen in SharePoint en blijft 7 dagen kiesbaar)
 ### Stap 2 — Foto's
 - Klik of sleep foto's (JPG, PNG, WEBP)
 - Maximaal 20 foto's per upload
@@ -151,6 +151,8 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 **Acceptatiecriteria:**
 - Events geladen uit SharePoint `VEPEvents` lijst
+- Alleen events waarvan de einddatum (`DateTo`, of `DateFrom` als einddatum ontbreekt) maximaal **7 dagen** geleden is, worden getoond — events blijven dus nog één week na afloop kiesbaar
+- Events zonder datum worden altijd getoond
 - Events gesorteerd op datum
 - Geselecteerd event visueel gemarkeerd
 - Lijst verversbaar via ↻ knop
@@ -163,7 +165,9 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
 - Chip **✏️ Ander event** zichtbaar onderaan de eventlijst
 - Bij klikken verschijnt vrij tekstveld
 - Ingevulde naam wordt gebruikt in titelbalk en slide
-- Eigen naam wordt **niet** opgenomen in de SharePoint eventlijst
+- De ingevoerde naam wordt **opgeslagen** in de SharePoint lijst `VEPEvents` (met `DateFrom`/`DateTo` = vandaag, categorie `Anders`), zodat het event — net als reguliere events — nog **7 dagen** kiesbaar blijft als chip voor alle leden
+- Bestaat een event met dezelfde naam al, dan wordt geen duplicaat aangemaakt
+- Het opslaan gebeurt op de achtergrond en blokkeert het uploaden nooit (fouten worden stil genegeerd)
 ---
  
 ### Epic 3 — Foto upload
@@ -295,7 +299,7 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 | Component | Versie | Locatie |
 |---|---|---|
-| Upload-app | v2.44 | `upload-app/index.html` |
+| Upload-app | v2.45 | `upload-app/index.html` |
 | Beheer-app | — | `beheer-app/index.html` |
 | Apps Script | — | Google Apps Script "VEP Foto Compilatie" |
  
@@ -303,4 +307,3 @@ De upload-app is een 4-stappen wizard waarmee leden foto's kunnen uploaden en ee
  
 - `no-cors` mode voor Apps Script POST: response niet leesbaar in browser, succes wordt aangenomen
 - Recente uploads worden alleen bewaard zolang de browsersessie actief is (geen persistente geschiedenis)
-- Eigen eventnaam (✏️ Ander event) wordt niet opgeslagen in SharePoint

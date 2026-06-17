@@ -70,7 +70,7 @@ function goStep(n) {
   if(n===3&&photos.length>MAX_PHOTOS){showErr('Verwijder eerst foto\'s tot maximaal '+MAX_PHOTOS+' voor je verdergaat.');return;}
   var customEvent=document.getElementById('in-custom-event')?document.getElementById('in-custom-event').value.trim():'';
   if(n===2&&!selectedEvent&&!customEvent){showErr('Kies een event of vul een eventnaam in.');return;}
-  if(n===2&&customEvent) selectedEvent=customEvent;
+  if(n===2&&customEvent){ selectedEvent=customEvent; if(typeof saveCustomEvent==='function') saveCustomEvent(customEvent); }
   clearErr();
 
   if(n===4){interaction=null;tbEditing=false;tbSelected=false;if(canvas)render();}
